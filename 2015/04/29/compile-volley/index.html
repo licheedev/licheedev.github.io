@@ -1,0 +1,310 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Windows下编译最新volley为jar包 | LicheeDev-某黎的博客</title>
+  <meta name="author" content="John Lee">
+  
+  <meta name="description" content="黎某人的博客。乱七八糟都记点。">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Windows下编译最新volley为jar包"/>
+  <meta property="og:site_name" content="LicheeDev-某黎的博客"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  <link href="/favicon.png" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="LicheeDev-某黎的博客" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.css" rel="stylesheet">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+<script>
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+	ga('create', 'UA-64082407-1', 'auto');
+	ga('send', 'pageview');
+
+</script>
+
+
+</head>
+
+
+<body>
+  <header id="header" class="inner"><div class="alignleft">
+  <h1><a href="/">LicheeDev-某黎的博客</a></h1>
+  <h2><a href="/">写博客的时候，我会假装四处看风景</a></h2>
+</div>
+<nav id="main-nav" class="alignright">
+  <ul>
+    
+      <li><a href="/">首页</a></li>
+    
+      <li><a href="/archives">归档</a></li>
+    
+      <li><a href="/about">关于</a></li>
+    
+      <li><a href="/atom.xml">订阅鄙站</a></li>
+    
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+<div class="clearfix"></div></header>
+  <div id="content" class="inner">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2015-04-29T06:10:59.000Z"><a href="/2015/04/29/compile-volley/">2015-04-29</a></time>
+      
+      
+  
+    <h1 class="title">Windows下编译最新volley为jar包</h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <p>蛋疼想自己编译个最新的volley jar用用，<br>随便搜了下方法，如这个 <a href="http://blog.csdn.net/wangjia55/article/details/41744181" target="_blank" rel="external">http://blog.csdn.net/wangjia55/article/details/41744181</a> ，<br>试着编译了下，结果各种报错，<br>最后强迫症发作，捣鼓出来了，<br>编译方式分两种，<a href="#ant"><strong><code>ant</code></strong></a>和<a href="#gradle"><strong><code>gradle</code></strong></a>的</p>
+<p></p><h2 id="ant">使用ant编译</h2><br>因为最新代码已经不在用ant改用gradle来构建工程，但是依然保留ant编译脚本，这里还是介绍一下，尽管比较麻烦<p></p>
+<h3 id="下载volley">下载volley</h3><p><code>git clone https://android.googlesource.com/platform/frameworks/volley</code><br><a id="more"></a></p>
+<h3 id="修改项目结构">修改项目结构</h3><ol>
+<li>进入<code>&lt;volley&gt;\src\main\</code>目录，将<code>java</code>文件夹重命名为<code>src</code>；</li>
+<li>将<code>&lt;volley&gt;\src\main\</code>文件夹里面的所有内容<code>剪切</code>到<code>&lt;volley&gt;</code>文件夹中；</li>
+<li>进入<code>&lt;volley&gt;\src\</code>目录，<code>删除</code>多余的<code>main</code>和<code>test</code>文件夹；</li>
+</ol>
+<h3 id="下载配置ant">下载配置ant</h3><blockquote>
+<p><strong>下载</strong> <a href="http://ant.apache.org/bindownload.cgi" target="_blank" rel="external">http://ant.apache.org/bindownload.cgi</a></p>
+</blockquote>
+<p>ant环境变量配置<br><figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">setx <span class="built_in">PATH</span> "<span class="envvar">%PATH%</span>;<span class="envvar">%%A</span>NT_HOME<span class="envvar">%%\</span>bin;<span class="envvar">%%A</span>NT_HOME<span class="envvar">%%\</span>lib" -m</span><br><span class="line">setx ANT_HOME "E:\DevTools\Others\apache-ant-<span class="number">1</span>.<span class="number">9</span>.<span class="number">4</span>" -m</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>P.S. <code>setx</code>是Windows Vista之后有的设置环境变量的工具，命令中的文件路径请按<code>实际情况</code>进行修改</p>
+</blockquote>
+<h3 id="配置Android_SDK环境变量">配置Android SDK环境变量</h3><figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">setx <span class="built_in">PATH</span> "<span class="envvar">%PATH%</span>;<span class="envvar">%%A</span>NDROID_HOME<span class="envvar">%%\</span>tools;<span class="envvar">%%A</span>NDROID_HOME<span class="envvar">%%\</span>platform-tools" -m</span><br><span class="line">setx ANDROID_HOME "E:\DevTools\AndroidStudio\sdk" -m</span><br></pre></td></tr></table></figure>
+<h3 id="更新anroid工程">更新anroid工程</h3><blockquote>
+<p>相关命令的使用说明可以用<code>android -h</code>来查看</p>
+</blockquote>
+<p><strong>首先</strong>cmd切换到<code>&lt;volley&gt;\</code>目录，运行<code>android list target</code>命令，查看已经安装的api的target id，这是待会编译用的api版本，选择适合的，记下id号（这个id号码跟api版本关系，完全是根据你安装了多少个api而定的），<br>如我要用最新的<code>api 22</code>来编译，这里就是<code>8</code>。<br><img src="http://i1.tietuku.com/a1423ea55fc86ee0.jpg" alt="target id"></p>
+<p><strong>然后</strong>运行<code>&gt;android - update lib-project -p . -t 8</code>（-t 后面的是刚才记下的target id号，自己按实际情况修改）更新工程。<br><img src="http://i1.tietuku.com/ccac55dd834cd8fb.jpg" alt="update lib-project"></p>
+<p><strong>之后</strong>会生成一些文件，打开其中的<code>project.properties</code>文件，<br>在文件的最后面加一句<code>renderscript.opt.level=O0</code>，保存。</p>
+<blockquote>
+<p>不加那句的话，等下用ant jar命令导出jar包会出错，参考<a href="https://stackoverflow.com/questions/11255805/use-ant-clean-test-with-the-newest-android-sdk-renderscript-opt-level-is" target="_blank" rel="external">Stack Overflow</a></p>
+</blockquote>
+<p><strong>最后</strong>运行<code>ant jar</code>命令即可，就可以在<code>bin</code>目录找到jar包了。<br><img src="http://i1.tietuku.com/fde7af3ac11a872f.jpg" alt="导出jar包"></p>
+<p></p><h2 id="gradle">使用gradle编译</h2><br>最新代码本身就是用gradle来构建的，所以简单很多<p></p>
+<h3 id="下载和配置gradle">下载和配置gradle</h3><blockquote>
+<p>下载 <a href="http://gradle.org/" target="_blank" rel="external">http://gradle.org/</a><br>正式版的Android Studio包含gradle，<br>在<code>&lt;android-studio\&gt;gradle\gradle-2.2.1</code>，自行选择用现成的还是重新下载</p>
+</blockquote>
+<p>配置环境变量<br><figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">setx <span class="built_in">PATH</span> "<span class="envvar">%PATH%</span>;<span class="envvar">%%G</span>RADLE_HOME<span class="envvar">%%\</span>bin" -m</span><br><span class="line">setx GRADLE_HOME "E:\DevTools\Others\gradle-<span class="number">2</span>.<span class="number">3</span>" -m</span><br><span class="line">setx GRADLE_USER_HOME "E:\DevWorks\.gradle" -m</span><br><span class="line">``` </span><br><span class="line">&gt; P.S. 其中前两项是配置可执行文件的<span class="built_in">PATH</span>，第三项是更改依赖仓库的位置，</span><br><span class="line">&gt; 默认情况下，依赖仓库在`C:\Users\&lt;username&gt;\.gradle`文件夹中，</span><br><span class="line">&gt; 我认为放在C盘不是个好的选择，因为这文件夹随着开发使用依赖库，而变得越来越大，</span><br><span class="line">&gt; 如果重装系统忘记备份，就悲剧了，得重新下载</span><br><span class="line"></span><br><span class="line">### 编译</span><br><span class="line">重新用git克隆一份volley源码，</span><br><span class="line">`git clone https://android.googlesource.com/platform/frameworks/volley`</span><br><span class="line">进入到`&lt;volley&gt;\`目录，打开`build.gradle`文件，找到</span><br><span class="line">```groovy </span><br><span class="line">buildscript &#123;</span><br><span class="line">    repositories &#123;</span><br><span class="line">        mavenCentral()</span><br><span class="line">    &#125;</span><br><span class="line">    dependencies &#123;</span><br><span class="line">        classpath 'com.android.tools.build:gradle:<span class="number">0</span>.<span class="number">14</span>.+'</span><br><span class="line">        // 当然，版本号可能跟我现在这个的不一样，</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>将其中的<code>&#39;com.android.tools.build:gradle:0.14.+&#39;</code><br>改成<code>&#39;com.android.tools.build:gradle:1.1.0&#39;</code></p>
+<blockquote>
+<p>这里的版本号到底怎么改，可以用Android Studio随便建一个工程，打开主module的build.gradle对照着改</p>
+</blockquote>
+<p>改完之后打开cmd，切换到<code>&lt;volley&gt;\</code>目录，<br>运行<code>gradle bundleRelease</code>，等待编译，<br>成功后可以找到<code>&lt;volley&gt;\build\intermediates\bundles\release\classes.jar</code>，即为编译后的jar包，重命名为<code>volley.jar</code>即可。</p>
+<h2 id="总结">总结</h2><p>上面说了这么多，其实只是强迫症犯了，想撇开IDE，用命令编译出个jar包来玩玩。<br>如果只需要使用volley的话，根本不用执着导出jar，有其他更方便的方法。<br>比如改了项目结构后，用Eclipse导入就可以用，Androd Studio更屌，改都不用改，直接导入为module就行。<br>不过有一颗折腾的心总是好的，反正也学到了新东西。</p>
+
+      
+    </div>
+    <footer>
+      
+      
+<section id="nav">
+  <div class="post-nav">
+    <div class="post-nav-prev">
+      
+        <a href="/2015/05/02/android-studio-settings/"><< 前一篇</a>
+      
+    </div>
+
+    <div class="post-nav-next">
+      
+        <a href="/2015/04/18/learn-python-1/">后一篇 >></a>
+      
+    </div>
+  </div>
+</section>
+
+        
+  
+  <div class="categories">
+    <a href="/categories/Android/">Android</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/volley/">volley</a>
+  </div>
+
+        
+      
+      <div class="clearfix"></div>
+    </footer>
+
+  </div>
+</article>
+
+<section id="comment">
+  <h1 class="title">评论</h1>
+
+    <div class="ds-thread" data-thread-key="2015/04/29/compile-volley/" data-title="Windows下编译最新volley为jar包" data-url="http://licheedev.com/2015/04/29/compile-volley/"></div>
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"licheedev"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.unstable.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+  </section>
+  
+
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"1","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"16"},"slide":{"type":"slide","bdImg":"3","bdPos":"right","bdTop":"100"}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+
+</div></div>
+    <aside id="sidebar" class="alignright">
+  <div class="search">
+  <form action="//google.com/search" method="get" accept-charset="utf-8">
+    <input type="search" name="q" results="0" placeholder="Google本站">
+    <input type="hidden" name="q" value="site:licheedev.com">
+  </form>
+</div>
+
+  
+<div class="widget social">
+  <h3 class="title">联系</h3>
+  <ul class="my-socials">
+    
+    <li>
+  	  <a href="https://github.com/licheedev" class="github" target="_blank">
+  		  <i class="fa fa-github"></i>
+  	  </a>
+    </li>
+    
+    <li>
+  	  <a href="http://weibo.com/licheedev" class="weibo" target="_blank">
+  		  <i class="fa fa-weibo"></i>
+  	  </a>
+    </li>
+    
+    
+    <li>
+   	  <a href="mailto:licheedev@foxmail.com" class="email" target="_blank" title="Email Me">
+  		 <i class="fa fa-envelope"></i>
+  	  </a>
+    </li>
+    
+  </ul>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">目录</h3>
+  <ul class="entry">
+  
+    <li><a href="/categories/Android/">Android</a><small>10</small></li>
+  
+    <li><a href="/categories/python/">python</a><small>1</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tagcloud">
+  <h3 class="title">标签云</h3>
+  <div class="entry">
+    <a href="/tags/Android/" style="font-size: 10px;">Android</a> <a href="/tags/Android-Studio/" style="font-size: 15px;">Android Studio</a> <a href="/tags/Glide/" style="font-size: 10px;">Glide</a> <a href="/tags/Gradle/" style="font-size: 20px;">Gradle</a> <a href="/tags/ImageView/" style="font-size: 10px;">ImageView</a> <a href="/tags/ListView/" style="font-size: 15px;">ListView</a> <a href="/tags/ViewHolder/" style="font-size: 15px;">ViewHolder</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/scaleType/" style="font-size: 10px;">scaleType</a> <a href="/tags/volley/" style="font-size: 10px;">volley</a>
+  </div>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">最近文章</h3>
+  <ul class="entry">
+    
+      <li>
+        <a href="/2015/06/22/gradle-proxy-for-as-1-3/">Android Studio（1.3版本）设置Gradle代理的正确姿势</a>
+      </li>
+    
+      <li>
+        <a href="/2015/05/23/android-multi-dex/">使用Multidex解决App方法数超过65536限制问题</a>
+      </li>
+    
+      <li>
+        <a href="/2015/05/21/android-best-practices/">【转载】Android 开发最佳实践</a>
+      </li>
+    
+      <li>
+        <a href="/2015/05/20/manifest-merger-failed/">解决Android Studio添加依赖时出现“Manifest merger failed”</a>
+      </li>
+    
+      <li>
+        <a href="/2015/05/16/imageview-scale-type/">ImageView的scaleType设置不当，导致使用Glide时出现OOM</a>
+      </li>
+    
+  </ul>
+</div>
+
+</aside>
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><div class="alignleft">
+  
+  &copy; 2015 John Lee
+  . 
+  Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> 
+  Theme by <a href="https://github.com/licheedev/hexo-theme-lightgreen" target="_blank">LightGreen</a> .
+              <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+            <span id="busuanzi_container_site_pv">本站总访问量 <a href="http://service.ibruce.info/" target="_blank"><span id="busuanzi_value_site_pv"></span></a> 次</span>
+</div>
+<div class="clearfix"></div></footer>
+  <script src="/js/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+<div id="totop" style="position:fixed;bottom:50px;right:50px;cursor: pointer;">
+<a title="返回顶部"><img src="/imgs/scrollup.png"/></a>
+</div>
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?c1a996e9a88b120ebf33af09f6dcc6ca";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+<script src="/js/totop.js"></script>
+</body>
+</html>

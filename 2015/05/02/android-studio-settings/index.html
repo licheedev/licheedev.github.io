@@ -1,0 +1,382 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Android Studio-1.2版本设置教程(部分内容过时，1.3版后再更新) | LicheeDev-某黎的博客</title>
+  <meta name="author" content="John Lee">
+  
+  <meta name="description" content="黎某人的博客。乱七八糟都记点。">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Android Studio-1.2版本设置教程(部分内容过时，1.3版后再更新)"/>
+  <meta property="og:site_name" content="LicheeDev-某黎的博客"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  <link href="/favicon.png" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="LicheeDev-某黎的博客" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.css" rel="stylesheet">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+<script>
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+	ga('create', 'UA-64082407-1', 'auto');
+	ga('send', 'pageview');
+
+</script>
+
+
+</head>
+
+
+<body>
+  <header id="header" class="inner"><div class="alignleft">
+  <h1><a href="/">LicheeDev-某黎的博客</a></h1>
+  <h2><a href="/">写博客的时候，我会假装四处看风景</a></h2>
+</div>
+<nav id="main-nav" class="alignright">
+  <ul>
+    
+      <li><a href="/">首页</a></li>
+    
+      <li><a href="/archives">归档</a></li>
+    
+      <li><a href="/about">关于</a></li>
+    
+      <li><a href="/atom.xml">订阅鄙站</a></li>
+    
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+<div class="clearfix"></div></header>
+  <div id="content" class="inner">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2015-05-02T09:01:40.000Z"><a href="/2015/05/02/android-studio-settings/">2015-05-02</a></time>
+      
+      
+  
+    <h1 class="title">Android Studio-1.2版本设置教程(部分内容过时，1.3版后再更新)</h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <blockquote>
+<p><strong>转载请注明原文出处 <a href="http://www.licheedev.com/2015/05/02/android-studio-settings/" target="_blank" rel="external">http://www.licheedev.com/2015/05/02/android-studio-settings/</a> </strong></p>
+</blockquote>
+<p>这两天Google更新了Android Studio 1.2正式版，新版本的设置界面大变面，设置条目较旧版本进行了归类，不像以前那样列表长长的了。</p>
+<p>趁着安装新版本的机会，把常用的设置记录一下，放到博客里面，以作备忘。</p>
+<a id="more"></a>
+<h1 id="Android_Studio_/_Gradle学习资源">Android Studio / Gradle学习资源</h1><p>在说设置之前，先上点学习Android Studio和Gradle的学习资源。</p>
+<h2 id="官方教程">官方教程</h2><ul>
+<li>developer.android.com上的<strong>Android Studio Overview</strong><br><a href="http://developer.android.com/tools/studio/index.html" target="_blank" rel="external">http://developer.android.com/tools/studio/index.html</a></li>
+<li>developer.android.com上的<strong>Build System Overview</strong><br><a href="http://developer.android.com/sdk/installing/studio-build.html" target="_blank" rel="external">http://developer.android.com/sdk/installing/studio-build.html</a></li>
+<li>tools.android.com上的<strong>Gradle Plugin User Guide*</strong>（Google出的Gradle指南）<br><a href="http://tools.android.com/tech-docs/new-build-system/user-guide" target="_blank" rel="external">http://tools.android.com/tech-docs/new-build-system/user-guide</a></li>
+<li>IntelliJ IDEA <strong>Quick Start</strong>（IDEA入门教程）<br><a href="https://www.jetbrains.com/idea/help/intellij-idea-quick-start-guide.html" target="_blank" rel="external">https://www.jetbrains.com/idea/help/intellij-idea-quick-start-guide.html</a></li>
+<li>IntelliJ IDEA的快捷键大全<br><a href="https://www.jetbrains.com/idea/docs/IntelliJIDEA_ReferenceCard_Mac.pdf" target="_blank" rel="external">https://www.jetbrains.com/idea/docs/IntelliJIDEA_ReferenceCard_Mac.pdf</a></li>
+</ul>
+<h2 id="非官方资源">非官方资源</h2><ul>
+<li><strong>Developer Phil博客</strong>的<strong>Android Studio Tips系列</strong>（里面提供快捷键效果的动态图，<strong>强烈推荐</strong>）<br><a href="http://www.developerphil.com/android-studio-tips-tricks-moving-around/#recent-posts-4" target="_blank" rel="external">http://www.developerphil.com/android-studio-tips-tricks-moving-around/#recent-posts-4</a></li>
+<li>Android-Studio-Tips-by-Philippe-Breault（貌似就是上面那个，还没细看，暂时不确定是不是一样，还是发出来好了）<br><a href="https://github.com/pavlospt/Android-Studio-Tips-by-Philippe-Breault/wiki" target="_blank" rel="external">https://github.com/pavlospt/Android-Studio-Tips-by-Philippe-Breault/wiki</a></li>
+<li><strong>stormzhang</strong>大神的<strong>Android Studio系列教程</strong>（推荐）<br><a href="http://stormzhang.com/posts.html#AndroidStudio" target="_blank" rel="external">http://stormzhang.com/posts.html#AndroidStudio</a></li>
+<li><strong>Rinvay Tang</strong>的博客<br>（《Gradle Plugin User Guide》翻译版，《使用Gradle构建Android程序》）（推荐）<br><a href="http://rinvay.github.io/archive.html" target="_blank" rel="external">http://rinvay.github.io/archive.html</a></li>
+<li><strong>Gradle Android插件用户指南翻译</strong>（《Gradle Plugin User Guide》另一个翻译版）<br><a href="http://avatarqing.github.io/Gradle-Plugin-User-Guide-Chinese-Verision/" target="_blank" rel="external">http://avatarqing.github.io/Gradle-Plugin-User-Guide-Chinese-Verision/</a></li>
+<li>Github上面搜“Android Studio”（很多好东西都在里面）<br><a href="https://github.com/search?utf8=%E2%9C%93&amp;q=Android+Studio" target="_blank" rel="external">https://github.com/search?utf8=%E2%9C%93&amp;q=Android+Studio</a></li>
+</ul>
+<h1 id="环境搭建相关">环境搭建相关</h1><h2 id="下载">下载</h2><p>正式版的Android Studio和SDK可以在下面的链接进行下载<br><a href="http://developer.android.com/sdk/index.html#Other" target="_blank" rel="external">http://developer.android.com/sdk/index.html#Other</a><br>关于下载，我建议下载绿色版的Android Studio和SDK，别下安装包版捆绑版的，这样如果有哪个出了问题要重装，只要动一个就行了。</p>
+<p><img src="http://i4.tietuku.com/d1cdaa3469459a3f.jpg" alt="下载"><br>其他版本可以在这里找到 <a href="http://tools.android.com/download/studio/canary" target="_blank" rel="external">http://tools.android.com/download/studio/canary</a> </p>
+<h2 id="禁用Windows中Ctrl+Space切换输入法的快捷键">禁用Windows中<code>Ctrl+Space</code>切换输入法的快捷键</h2><p>Windows的Ctrl+Space快捷键（切换中文输入法）跟一堆IDE的冲突，所以必须禁用掉，按照下图那样修改注册表即可。<br>或者下载我改好的注册表文件（<a href="https://github.com/licheedev/filestore/raw/master/others/disable_ctrl_space.zip" target="_blank" rel="external">右键另存为</a>），双击导入压缩包里面的文件，重启系统即可。</p>
+<p><img src="http://i4.tietuku.com/4824ab2a935b548c.jpg" alt="禁用Windows+Space快捷键"><br>原理参考<a href="http://answers.microsoft.com/en-us/windows/forum/windows_vista-desktop/how-do-i-disable-the-changing-of-languages-when-i/f01de525-73b2-4c4e-969e-b5aa001c0eb7" target="_blank" rel="external">这里</a>。</p>
+<h2 id="环境变量">环境变量</h2><p>很多IDE依赖环境变量，正确设置好环境变量，可以确保软件能正常运行，和避免很多莫名奇妙的问题。</p>
+<p>设置环境变量的方法请自行搜索。下面的环境变量值都是我自己电脑的，请按照<code>实际情况</code>进行修改。<br>还有<code>PATH</code>的要特别注意，要加到原来的后面，别一脑门全部覆盖掉。</p>
+<h3 id="JAVA">JAVA</h3><figure class="highlight mel"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">JAVA_HOME=E:\DevTools\Others\Java\jdk1.7.0_67</span><br><span class="line">CLASSPATH=.;<span class="variable">%JAVA_HOME</span><span class="variable">%\</span>lib;<span class="variable">%JAVA_HOME</span><span class="variable">%\</span>lib\tools.jar</span><br><span class="line"># 注意，<span class="variable">%PATH</span><span class="variable">%为</span>原来的环境变量值，添加<span class="string">";"</span>和后面的内容到原来值的后面</span><br><span class="line">PATH=<span class="variable">%PATH</span><span class="variable">%;</span><span class="variable">%JAVA_HOME</span><span class="variable">%\</span>bin;<span class="variable">%JAVA_HOME</span><span class="variable">%\</span>jre\bin</span><br></pre></td></tr></table></figure>
+<h3 id="Android_SDK">Android SDK</h3><figure class="highlight mel"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ANDROID_HOME=E:\DevTools\Android\sdk</span><br><span class="line">PATH=<span class="variable">%PATH</span><span class="variable">%;</span><span class="variable">%ANDROID_HOME</span><span class="variable">%\</span>tools;<span class="variable">%ANDROID_HOME</span><span class="variable">%\</span>platform-tools</span><br><span class="line"># ADB端口，可以避免国内一堆软件，如酷狗音乐啥的把ADB端口抢占了，值随便改个不常用的就行</span><br><span class="line">ANDROID_ADB_SERVER_PORT=<span class="number">7123</span></span><br></pre></td></tr></table></figure>
+<h3 id="Gradle">Gradle</h3><figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="special">#</span> Android Studio正式版后就内置了一个Gradle，当然你也可以另外去Gradle官网下载一个</span><br><span class="line">GRADLE_HOME=E:<span class="command">\DevTools</span><span class="command">\Android</span><span class="command">\android</span>-studio<span class="command">\gradle</span><span class="command">\gradle</span>-2.2.1<span class="command">\bin</span></span><br><span class="line">PATH=<span class="comment">%PATH%;%GRADLE_HOME%\bin</span></span><br><span class="line"><span class="special">#</span> 依赖仓库存放路径，平时构建工程时下载的依赖库都放在这里</span><br><span class="line"><span class="special">#</span> 不配置的话，Windows中默认是在C:<span class="command">\Users</span><span class="command">\&lt;</span>username&gt;<span class="command">\.</span>gradle的</span><br><span class="line"><span class="special">#</span> 重装系统时忘记备份，又不想重新下载依赖的话，就赶紧把这里改了</span><br><span class="line">GRADLE_USER_HOME=E:<span class="command">\DevWorks</span><span class="command">\.</span>gradle</span><br></pre></td></tr></table></figure>
+<h2 id="运行Android_Studio前的配置">运行Android Studio前的配置</h2><h3 id="配置SDK_Manager科学上网，升级SDK">配置SDK Manager科学上网，升级SDK</h3><p>最近红杏出了公益代理，简直是开发人员的福音，详情看：<a href="http://blog.honx.in/dev-only/" target="_blank" rel="external">http://blog.honx.in/dev-only/</a><br>按照红杏提供地址和端口（目前是<code>hx.gy:1080</code>）进行修改（别加<code>http://</code>），必要时可以按一下“Clear Cache”。</p>
+<p>有条件的话，可以试试买个付费的shadowsocks，我现在shadowsocks.com的99包年套餐。<br>电信8M，部分线路能达到900多KB/s的速度，几乎满速了，感觉还行。<br>具体怎么购买和配置，不在本文介绍范围内，请自行找科普。<br>如果要买的话，请务必用 <a href="https://portal.shadowsocks.com/aff.php?aff=470" target="_blank" rel="external"><code>我的推广链接</code></a> ，我有提成的。（笑）</p>
+<p><img src="http://i1.tietuku.com/655456e2121590d9.jpg" alt="SDK Manager配置"></p>
+<p>关于下载，<code>Tools</code>中<code>Android SDK Build-tools</code>建议<code>全部下载</code>，<br>其他各个API版本，建议至少下载<code>SDK Platform</code>（必须，framework层的东东全在这里）和<code>Sources for Android SDK</code>（源码），<br><code>Extras</code>中<strong><em>必须</em></strong>下载<code>Android Support Repository</code>和<code>Android Support Library</code>（Support库的东东，现在开发离不开Support库了），<br>上面提到的是开发必须用到的，其他东西就看情况了，你有时间又不在乎资源占用的话，全下载都行。<br>顺便附上我自己下载的，<a href="http://i1.tietuku.com/53c9ca6eee9d8ab6.jpg" target="_blank" rel="external">猛戳此连接查看</a>。</p>
+<p><a id="idea-properties"></a></p>
+<h3 id="修改idea-properties文件">修改idea.properties文件</h3><p>找到<code>&lt;android-studio&gt;\bin\idea.properties</code>文件，打开，改成这样：</p>
+<p><img src="http://i4.tietuku.com/6e2599351ee2b032.jpg" alt="idea.properties"></p>
+<figure class="highlight puppet"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 禁止第一次运行Android Studio时，自动检查和升级Android SDK</span></span><br><span class="line">disable.android.first.run=<span class="keyword">true</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 下面两个是Android Studio的设置、插件和运行时产生的其他文件存放的目录</span></span><br><span class="line"><span class="comment"># 不改的话，Windows中默认在 C:\Users\&lt;username&gt;\.AndroidStudio.2\ 里面</span></span><br><span class="line"><span class="comment"># $&#123;idea.home.path&#125;表示Android Studio程序的主目录，注意目录分隔符要用正斜杠“/”</span></span><br><span class="line">idea.config.<span class="built_in">path</span>=$<span class="keyword">&#123;</span>idea.<span class="literal">home</span>.<span class="built_in">path</span><span class="keyword">&#125;</span>/.<span class="constant">Android</span>Studio.<span class="number">2</span>/config</span><br><span class="line">idea.<span class="literal">system</span>.<span class="built_in">path</span>=$<span class="keyword">&#123;</span>idea.<span class="literal">home</span>.<span class="built_in">path</span><span class="keyword">&#125;</span>/.<span class="constant">Android</span>Studio.<span class="number">2</span>/<span class="literal">system</span></span><br></pre></td></tr></table></figure>
+<p>非常坑爹的是，每次Android Studio升级时，都会强制检测AS主目录里面的文件或文件夹是否被动过，<br>当然也包含这个idea.properties，<br>有些增强模板或插件，例如这个 <a href="https://github.com/gabrielemariotti/AndroidStudioTemplate" target="_blank" rel="external">AndroidStudioTemplate</a>，安装时要求覆盖<code>&lt;android-studio&gt;\plugins\android\lib\templates</code>。<br>如果发现被改了，就会要求进行<del>处理</del>（恢复默认）操作，举例来说，idea.properties和那个templates会被还原为解压时的模样，各种修改都会失效。<br>所以保险起见，这个<code>idea.properties</code>文件改完就备份一下，以后升级完AS，就手动改回去，各种插件/模板也存一个备份，别装完就删掉，免得被AS的升级程序删了后找不回来。</p>
+<h1 id="设置Android_Studio">设置Android Studio</h1><p>正题来了，运行后，进入欢迎界面，别急着建工程，先<code>Configure</code>→<code>Settings</code>去修改设置。</p>
+<h2 id="IDE外观&amp;行为">IDE外观&amp;行为</h2><h3 id="修改主题，修改全局字体">修改主题，修改全局字体</h3><p><img src="http://i4.tietuku.com/a7467ac2bd7067bf.jpg" alt="主题&amp;字体"></p>
+<ol>
+<li>修改主题，想用炫酷的深色主题，就改成<code>Darcula</code>吧；<br>字体的话，选一个带中文的，要不然会有很多<code>口口</code>，我这里用<code>Microsoft YaHei UI</code>，很不错。</li>
+<li>启用/禁用动画特效，禁用掉感觉可能会快点。</li>
+</ol>
+<h3 id="禁止自动打开上次的工程">禁止自动打开上次的工程</h3><p>我喜欢自己选打开哪个工程，果断禁用</p>
+<p><img src="http://i4.tietuku.com/ea4fb529175d61fc.jpg" alt="禁止自动打开最后打开的工程"></p>
+<h3 id="设置网络代理">设置网络代理</h3><p>跟上文一样，改为红杏公益代理吧</p>
+<p><img src="http://i4.tietuku.com/699907660e9f6148.jpg" alt="代理"></p>
+<h3 id="禁用自动检查更新">禁用自动检查更新</h3><p>洁癖的选择，升级控请无视</p>
+<p><img src="http://i4.tietuku.com/44821b256312b44c.jpg" alt="禁用更新"></p>
+<h3 id="配置快捷键">配置快捷键</h3><p>不管你改不改，反正我没改，默认的好，免得以后查资料，操作对不上</p>
+<p><img src="http://i4.tietuku.com/a1e17305d06190a3.jpg" alt="快捷键"></p>
+<h2 id="编辑器">编辑器</h2><h3 id="鼠标悬停显示文档，格式化&amp;导包提示">鼠标悬停显示文档，格式化&amp;导包提示</h3><p><img src="http://i4.tietuku.com/9fd64f9122214d96.jpg" alt="鼠标悬停显示文档，格式化&amp;导包提示"></p>
+<ol>
+<li>鼠标指针悬停若干时间，显示文档，时间自己改。</li>
+<li>就是按格式化代码或者导包时，是否会显示个对话框，觉得烦人的话，都取消掉吧，反正我取消了。</li>
+</ol>
+<h3 id="显示行号，显示方法分隔线">显示行号，显示方法分隔线</h3><p>勾上吧，你值得拥有的</p>
+<p><img src="http://i4.tietuku.com/7022f5b4a39a5dbe.jpg" alt="显示行号，显示方法分隔线"></p>
+<h3 id="代码折叠">代码折叠</h3><p>Intellij IDEA有很多地方的代码都能自动折叠，不过我看不惯，所以取消了，这里见仁见智，看着办<br>P.S. <code>Ctrl + .</code> 可以折叠和展开代码</p>
+<p><img src="http://i4.tietuku.com/e156cf6e6bb500d3.jpg" alt="代码折叠"></p>
+<h3 id="代码智能提示">代码智能提示</h3><p><img src="http://i4.tietuku.com/afcfe37b9d6ebba5.jpg" alt="代码智能提示"></p>
+<ol>
+<li>敲什么字符会提示，All(大小写全部符合)，None（不管大小写，符合就提示），（First letter）（第一个字符符合就OK，其他随意）。我这种脑残没记性的当然选择None。</li>
+<li>自动弹出文档，时间看着办。</li>
+<li>自动弹出方法参数提示，时间看着办。</li>
+</ol>
+<h3 id="自动导包">自动导包</h3><p><img src="http://i4.tietuku.com/a1bb4e23dde8936a.jpg" alt="自动导包"></p>
+<ul>
+<li>Optimize imports on the fly：优化导包，格式化代码时会删掉多余的导包。</li>
+<li>Add unambiguous imports on the fly：敲代码时，敲简单类名就帮你把包导了。</li>
+</ul>
+<h3 id="创建个人代码样式配置">创建个人代码样式配置</h3><p>估计是为了保护默认的代码样式配置，让用户把配置搞坏了也能一键还原，IDEA不允许修改默认的配置，需要用户创建配置才能进行修改。<br>选择基于哪个主题的，然后<code>Save As</code>一份即可。</p>
+<p><img src="http://i4.tietuku.com/2b866c9c4021e70a.jpg" alt="创建个人代码样式配置"></p>
+<h3 id="修改代码字体">修改代码字体</h3><p>强烈建议用<code>Consolas</code>字体，好看！！！</p>
+<p><img src="http://i4.tietuku.com/7e949854b0c76c50.jpg" alt="修改代码字体"></p>
+<h3 id="修改控制台字体">修改控制台字体</h3><p>好吧，我就喜欢这个字体不行么？</p>
+<p><img src="http://i4.tietuku.com/4188c779b2651289.jpg" alt="修改控制台字体"></p>
+<h3 id="Logcat字体">Logcat字体</h3><p>要改的话，得先把1那个地方的勾取消掉</p>
+<p><img src="http://i4.tietuku.com/a1d8f83d58306671.jpg" alt="Logcat字体"></p>
+<h3 id="修改注释位置，禁用“语句堆一行”">修改注释位置，禁用“语句堆一行”</h3><p><img src="http://i4.tietuku.com/bfdcc07101de949c.jpg" alt="修改注释位置，禁用“语句堆一行”"></p>
+<ul>
+<li>Comment at frist column：启用的话，注释符号就会在行首，否则就按照缩进来注释。我取消掉了。</li>
+<li>Control statement in one line：格式化代码的时候，会把些很短的语句合并成一行。我觉得这样影响代码可读性，故取消。</li>
+</ul>
+<h3 id="修改变量前后缀">修改变量前后缀</h3><p>静态成员是s，普通成员是m，有点意思</p>
+<p><img src="http://i4.tietuku.com/f623911b2a24b3ae.jpg" alt="变量前缀"></p>
+<h3 id="修改新建文件文件头">修改新建文件文件头</h3><p>每次建新类的话，对下面这段注释肯定很熟悉。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span><br><span class="line"> * Created by licheedev on 2015/5/2.</span><br><span class="line"> */</span></span><br></pre></td></tr></table></figure>
+<p><img src="http://i4.tietuku.com/11df21d9d347afcd.jpg" alt="通用文件头"></p>
+<p>上图就是通用的文件头，框住的地方是你系统的用户名，想个性化的话，可以改这里，至于哪里引用这个文件头的呢，就在隔壁。</p>
+<p><img src="http://i4.tietuku.com/17155e2a606bf083.jpg" alt="引用文件头"></p>
+<h3 id="修改文件编码为UTF-8">修改文件编码为UTF-8</h3><p>别坑队友，小伙伴们都统一改为UTF-8吧。</p>
+<p><img src="http://i4.tietuku.com/5c6399212e1bea83.jpg" alt="修改文件编码为UTF-8"></p>
+<h2 id="体验增强">体验增强</h2><h3 id="增强Live_Templates（Ctrl+J的智能提示模板）">增强Live Templates（<code>Ctrl+J</code>的智能提示模板）</h3><p>默认的Live Templates不够用，连foreach都没，幸好Github上的大神做了增强的模板，果断拿来用。</p>
+<blockquote>
+<p>idea-live-templates： <a href="https://github.com/keyboardsurfer/idea-live-templates" target="_blank" rel="external">https://github.com/keyboardsurfer/idea-live-templates</a></p>
+</blockquote>
+<p>文件下载后，找到下面这个目录：<br><code>&lt;android-studio&gt;\.AndroidStudio.2\config\templates</code>，<br>至于为什么是这个目录，麻烦往前补补 <a href="#idea-properties"><strong>修改idea.properties文件</strong></a> ,</p>
+<p>如果没有<code>templates</code>文件夹的话，自己手动建一个即可。</p>
+<p><img src="http://i4.tietuku.com/8ed6fb052db5d55e.jpg" alt="只要xml文件"></p>
+<p>把所有<code>*.xml</code>文件弄进那个文件夹，重新打开Android Studio，就能看到效果了。</p>
+<p><img src="http://i4.tietuku.com/3bfbf68635f3a38d.jpg" alt="修改foreach"></p>
+<p><code>foreach</code>那里要改一个设置，否则<code>for ($i$ : $data$) {</code>会被自动格式化为多行。<br>下面是<code>foreach</code>和<code>fbc</code>的动图演示</p>
+<p><img src="http://i4.tietuku.com/6d3e735486ae8a9d.gif" alt="foreach&amp;fbc"></p>
+<h1 id="おわり">おわり</h1><p><img src="http://i4.tietuku.com/46bec46a702f7b52.gif" alt="_(:з」∠)_"></p>
+<p>搞定，Android Studio基本设置教程暂时这样了，以后有新东西再更新，其他编译系统相关的暂时不是摸得很明白，就不乱来误人子弟了。<br>可累了。</p>
+
+      
+    </div>
+    <footer>
+      
+      
+<section id="nav">
+  <div class="post-nav">
+    <div class="post-nav-prev">
+      
+        <a href="/2015/05/05/hide-taskbar/"><< 前一篇</a>
+      
+    </div>
+
+    <div class="post-nav-next">
+      
+        <a href="/2015/04/29/compile-volley/">后一篇 >></a>
+      
+    </div>
+  </div>
+</section>
+
+        
+  
+  <div class="categories">
+    <a href="/categories/Android/">Android</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/Android-Studio/">Android Studio</a>
+  </div>
+
+        
+      
+      <div class="clearfix"></div>
+    </footer>
+
+  </div>
+</article>
+
+<section id="comment">
+  <h1 class="title">评论</h1>
+
+    <div class="ds-thread" data-thread-key="2015/05/02/android-studio-settings/" data-title="Android Studio-1.2版本设置教程(部分内容过时，1.3版后再更新)" data-url="http://licheedev.com/2015/05/02/android-studio-settings/"></div>
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"licheedev"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.unstable.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+  </section>
+  
+
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"1","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"16"},"slide":{"type":"slide","bdImg":"3","bdPos":"right","bdTop":"100"}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+
+</div></div>
+    <aside id="sidebar" class="alignright">
+  <div class="search">
+  <form action="//google.com/search" method="get" accept-charset="utf-8">
+    <input type="search" name="q" results="0" placeholder="Google本站">
+    <input type="hidden" name="q" value="site:licheedev.com">
+  </form>
+</div>
+
+  
+<div class="widget social">
+  <h3 class="title">联系</h3>
+  <ul class="my-socials">
+    
+    <li>
+  	  <a href="https://github.com/licheedev" class="github" target="_blank">
+  		  <i class="fa fa-github"></i>
+  	  </a>
+    </li>
+    
+    <li>
+  	  <a href="http://weibo.com/licheedev" class="weibo" target="_blank">
+  		  <i class="fa fa-weibo"></i>
+  	  </a>
+    </li>
+    
+    
+    <li>
+   	  <a href="mailto:licheedev@foxmail.com" class="email" target="_blank" title="Email Me">
+  		 <i class="fa fa-envelope"></i>
+  	  </a>
+    </li>
+    
+  </ul>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">目录</h3>
+  <ul class="entry">
+  
+    <li><a href="/categories/Android/">Android</a><small>10</small></li>
+  
+    <li><a href="/categories/python/">python</a><small>1</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tagcloud">
+  <h3 class="title">标签云</h3>
+  <div class="entry">
+    <a href="/tags/Android/" style="font-size: 10px;">Android</a> <a href="/tags/Android-Studio/" style="font-size: 15px;">Android Studio</a> <a href="/tags/Glide/" style="font-size: 10px;">Glide</a> <a href="/tags/Gradle/" style="font-size: 20px;">Gradle</a> <a href="/tags/ImageView/" style="font-size: 10px;">ImageView</a> <a href="/tags/ListView/" style="font-size: 15px;">ListView</a> <a href="/tags/ViewHolder/" style="font-size: 15px;">ViewHolder</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/scaleType/" style="font-size: 10px;">scaleType</a> <a href="/tags/volley/" style="font-size: 10px;">volley</a>
+  </div>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">最近文章</h3>
+  <ul class="entry">
+    
+      <li>
+        <a href="/2015/06/22/gradle-proxy-for-as-1-3/">Android Studio（1.3版本）设置Gradle代理的正确姿势</a>
+      </li>
+    
+      <li>
+        <a href="/2015/05/23/android-multi-dex/">使用Multidex解决App方法数超过65536限制问题</a>
+      </li>
+    
+      <li>
+        <a href="/2015/05/21/android-best-practices/">【转载】Android 开发最佳实践</a>
+      </li>
+    
+      <li>
+        <a href="/2015/05/20/manifest-merger-failed/">解决Android Studio添加依赖时出现“Manifest merger failed”</a>
+      </li>
+    
+      <li>
+        <a href="/2015/05/16/imageview-scale-type/">ImageView的scaleType设置不当，导致使用Glide时出现OOM</a>
+      </li>
+    
+  </ul>
+</div>
+
+</aside>
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><div class="alignleft">
+  
+  &copy; 2015 John Lee
+  . 
+  Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> 
+  Theme by <a href="https://github.com/licheedev/hexo-theme-lightgreen" target="_blank">LightGreen</a> .
+              <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+            <span id="busuanzi_container_site_pv">本站总访问量 <a href="http://service.ibruce.info/" target="_blank"><span id="busuanzi_value_site_pv"></span></a> 次</span>
+</div>
+<div class="clearfix"></div></footer>
+  <script src="/js/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+<div id="totop" style="position:fixed;bottom:50px;right:50px;cursor: pointer;">
+<a title="返回顶部"><img src="/imgs/scrollup.png"/></a>
+</div>
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?c1a996e9a88b120ebf33af09f6dcc6ca";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+<script src="/js/totop.js"></script>
+</body>
+</html>

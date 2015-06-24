@@ -1,0 +1,799 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  
+  <title><![CDATA[LicheeDev-某黎的博客]]></title>
+  <subtitle><![CDATA[写博客的时候，我会假装四处看风景]]></subtitle>
+  <link href="/atom.xml" rel="self"/>
+  <link href="http://licheedev.com//"/>
+  <updated>2015-06-22T15:54:50.629Z</updated>
+  <id>http://licheedev.com//</id>
+  
+  <author>
+    <name><![CDATA[John Lee]]></name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title><![CDATA[Android Studio（1.3版本）设置Gradle代理的正确姿势]]></title>
+    <link href="http://licheedev.com/2015/06/22/gradle-proxy-for-as-1-3/"/>
+    <id>http://licheedev.com/2015/06/22/gradle-proxy-for-as-1-3/</id>
+    <published>2015-06-22T14:01:50.000Z</published>
+    <updated>2015-06-22T15:54:50.629Z</updated>
+    <content type="html"><![CDATA[<h1 id="遭遇">遭遇</h1><p>手贱把自己电脑的Android Studio升级到最新的1.3 Preview。<br>然后上星期帮朋友配置Robolectric，要各种下载依赖，结果速度慢得要死。<br>检查了一下网络连接，囧了，发现没走梯子(shadowsocks没速度)，直连了，如下图：</p>
+<p><img src="http://i1.tietuku.com/9a444c33d040beee.png" alt="没走代理走直连"><br><a id="more"></a></p>
+<h1 id="测试">测试</h1><p>好吧，于是切换了各种代理姿势：</p>
+<ol>
+<li><p>基本的HTTP Proxy设置</p>
+<p><img src="http://i4.tietuku.com/e749fd31c22907a5.jpg" alt="基本的HTTP Proxy设置"></p>
+<p>一开始就设置代理到shadowsocks，不过<code>无效</code></p>
+</li>
+<li><p>设置编译参数</p>
+<p><img src="http://i4.tietuku.com/6664b475570d604d.jpg" alt="编译参数"></p>
+<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-Dhttp.<span class="variable">proxyHost=</span><span class="number">127.0</span>.<span class="number">0.1</span> -Dhttp.<span class="variable">proxyPort=</span><span class="number">8123</span> -Dhttps.<span class="variable">proxyHost=</span><span class="number">127.0</span>.<span class="number">0.1</span> -Dhttps.<span class="variable">proxyPort=</span><span class="number">8123</span></span><br></pre></td></tr></table></figure>
+<p>然而并没有什么卵用。</p>
+</li>
+<li><p>设置GRADLE_OPTS环境变量</p>
+<p>跟上面的差不多，新建环境变量<code>GRADLE_OPTS</code>，值为以下，不过还是<code>无效</code></p>
+<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-Dhttp.<span class="variable">proxyHost=</span><span class="number">127.0</span>.<span class="number">0.1</span> -Dhttp.<span class="variable">proxyPort=</span><span class="number">8123</span> -Dhttps.<span class="variable">proxyHost=</span><span class="number">127.0</span>.<span class="number">0.1</span> -Dhttps.<span class="variable">proxyPort=</span><span class="number">8123</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>按照Android Studio的烦人提示，往<code>gradle.properties</code>文件中添加代理配置<br>如果使用了AS1.3版本，并按照1那样设置了代理，就一定会弹出下面这个烦人的提示（最近两次更新已经提供了闭嘴选项，左下角那里）</p>
+<p><img src="http://i4.tietuku.com/11dcd0b7ebd01522.jpg" alt="Proxy Settings提示"></p>
+<p>选了Yes的结果就是，项目的<code>gradle.properties</code>文件中会多了两句（跟1中的设置对应）：</p>
+<p><img src="http://i4.tietuku.com/c8a85c448bddff8c.jpg" alt="具体配置"></p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">systemProp<span class="class">.http</span><span class="class">.proxyHost</span>=<span class="number">127.0</span>.<span class="number">0.1</span></span><br><span class="line">systemProp<span class="class">.http</span><span class="class">.proxyPort</span>=<span class="number">8123</span></span><br></pre></td></tr></table></figure>
+<p>然并卵，还是坑。</p>
+<blockquote>
+<p>P.S. 如果不小心让这玩意闭嘴了，又舍不得，可以通过修改下列参数再次打开，具体文件位置请自行搜索。<br><img src="http://i4.tietuku.com/a8f15efd90d8f5a1.jpg" alt="不要闭嘴"></p>
+</blockquote>
+</li>
+</ol>
+<h1 id="解决">解决</h1><p>不得不说，Gogole太能玩开发者，自己提供的解决方案，竟然不能用，有考虑过我们这些苦逼的中国开发者的感受么。</p>
+<p>好吧，先搜搜看，就用<code>android studio 1.3 proxy</code>做关键词，别用百度，</p>
+<p>然后看我找到了什么：</p>
+<blockquote>
+<p><a href="https://code.google.com/p/android/issues/detail?id=176296" target="_blank" rel="external">https://code.google.com/p/android/issues/detail?id=176296</a></p>
+<p>Android Studio sets automatically the proxy settings for gradle in gradle.properties.</p>
+<p>You should add the proxy-Settings for https, not only for http:</p>
+<p>systemProp.https.proxyHost=<ip><br>systemProp.https.proxyPort=<port></port></ip></p>
+<p>Reproducable in Android Studio 1.3 (AI-141.1989493) (RC3?)</p>
+</blockquote>
+<p>试试看，往项目的<code>gradle.properties</code>里面多加两句</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">systemProp<span class="class">.https</span><span class="class">.proxyHost</span>=<span class="number">127.0</span>.<span class="number">0.1</span></span><br><span class="line">systemProp<span class="class">.https</span><span class="class">.proxyPort</span>=<span class="number">8123</span></span><br></pre></td></tr></table></figure>
+<p>经检验，成功启动代理，麻麻再也不用担心被墙了。</p>
+<p><img src="http://i1.tietuku.com/3119df3d8616cd69.jpg" alt="成功代理"></p>
+<h1 id="总结">总结</h1><p>其实我在1.2版本之前，本人就试过按照上文那样，在gradle.properties里面设置过代理，但是那时候只要加了那几句配置了，AS就会提示找不到依赖，那时候排查了很久，才发现是那里的问题。<br><code>如果是AS1.2或以前，只要在HTTP Proxy那里设置代理，就能很好地运作.</code><br>不过到了AS1.3，情况完全相反，不设置还不行。搞不明白Google修改这个的动机是啥。</p>
+<p>虽然找到了方法，不过每个项目的改一下太麻烦了，而且代理什么的因人而异，如果项目开源了，别人很有可能不需要设置代理，或者使用的是别的代理，这样修改无异于画蛇添足。</p>
+<p>其实Gralde还提供全局<code>gradle.properties</code>方案，参考这里：</p>
+<blockquote>
+<p><a href="https://docs.gradle.org/current/userguide/build_environment.html" target="_blank" rel="external">https://docs.gradle.org/current/userguide/build_environment.html</a></p>
+</blockquote>
+<p><code>Gradle user home</code>是存放依赖库，还有默认gradle参数的地方，默认在这些文件夹</p>
+<blockquote>
+<p>/home/<username>/.gradle/ (Linux)<br>/Users/<username>/.gradle/ (Mac)<br>C:\Users\<username>.gradle (Windows)</username></username></username></p>
+</blockquote>
+<p>当然，也能通过环境变量<code>GRADLE_USER_HOME</code>来指定，<br>在<code>Gradle user home</code>文件夹下建立<code>gradle.properties</code>文件，然后加上代理的配置即可，如下图</p>
+<p><img src="http://i4.tietuku.com/821d27b7df55d1be.jpg" alt="全局代理"></p>
+<p>这样就完成了全局代理的配置。</p>
+<p>附上完整的可选代理配置：</p>
+<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># http</span></span><br><span class="line">systemProp.<span class="keyword">http</span>.proxyHost=www.somehost.org</span><br><span class="line">systemProp.<span class="keyword">http</span>.proxyPort=<span class="number">8080</span></span><br><span class="line">systemProp.<span class="keyword">http</span>.proxyUser=userid</span><br><span class="line">systemProp.<span class="keyword">http</span>.proxyPassword=password</span><br><span class="line">systemProp.<span class="keyword">http</span>.nonProxyHosts=*.nonproxyrepos.com|localhost</span><br><span class="line"><span class="comment"># https</span></span><br><span class="line">systemProp.<span class="keyword">https</span>.proxyHost=www.somehost.org</span><br><span class="line">systemProp.<span class="keyword">https</span>.proxyPort=<span class="number">8080</span></span><br><span class="line">systemProp.<span class="keyword">https</span>.proxyUser=userid</span><br><span class="line">systemProp.<span class="keyword">https</span>.proxyPassword=password</span><br><span class="line">systemProp.<span class="keyword">https</span>.nonProxyHosts=*.nonproxyrepos.com|localhost</span><br></pre></td></tr></table></figure>]]></content>
+    <summary type="html">
+    <![CDATA[<h1 id="遭遇">遭遇</h1><p>手贱把自己电脑的Android Studio升级到最新的1.3 Preview。<br>然后上星期帮朋友配置Robolectric，要各种下载依赖，结果速度慢得要死。<br>检查了一下网络连接，囧了，发现没走梯子(shadowsocks没速度)，直连了，如下图：</p>
+<p><img src="http://i1.tietuku.com/9a444c33d040beee.png" alt="没走代理走直连"><br>]]>
+    
+    </summary>
+    
+      <category term="Gradle" scheme="http://licheedev.com/tags/Gradle/"/>
+    
+      <category term="Android" scheme="http://licheedev.com/categories/Android/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[使用Multidex解决App方法数超过65536限制问题]]></title>
+    <link href="http://licheedev.com/2015/05/23/android-multi-dex/"/>
+    <id>http://licheedev.com/2015/05/23/android-multi-dex/</id>
+    <published>2015-05-23T15:54:35.000Z</published>
+    <updated>2015-06-22T16:33:10.845Z</updated>
+    <content type="html"><![CDATA[<p>有朋友问，App引用的库太多，方法数超过65536后无法编译。<br>其实就是众所周知的单个dex里面不能有超过65536个方法问题。</p>
+<p>不知道什么时候开始，Android开发者主页就给出了解决方法的专题页面（需要科学上网）。</p>
+<blockquote>
+<p><a href="http://developer.android.com/tools/building/multidex.html" target="_blank" rel="external">http://developer.android.com/tools/building/multidex.html</a><br><a id="more"></a></p>
+</blockquote>
+<p>里面的说明很详细，英文差不多的直接就看链接的页面就行了，完全可以无视我下面的内容（反正我也就复述一下）。</p>
+<p>得益于新的Android App构建系统Gradle，可以很简单地开启<code>Multidex</code>解决<code>65536</code>问题，寥寥几个步骤即可，要修改的代码连10行都不用。</p>
+<p>不过上述专题页里面提到了<code>Multidex</code>有<a href="http://developer.android.com/tools/building/multidex.html#limitations" target="_blank" rel="external"><strong>局限性</strong></a>：</p>
+<ul>
+<li>如果第二个（或其他个）dex文件很大的话，安装.dex文件到data分区时可能会导致ANR（应用程序无响应）。</li>
+<li>由于Dalvik linearAlloc的bug的关系，使用了multidex的应用可能无法在Android 4.0 (API level 14)或之前版本的设备上运行。</li>
+<li>由于Dalvik linearAlloc的限制，使用了multidex的应用会请求非常大的内存分配，从而导致程序奔溃。</li>
+<li>在Dalvik运行时中，某些类的方法必须要放在主dex中，Android构建工具可能无法确保所有有此要求的类被编译进主dex中。</li>
+</ul>
+<p>总之，Google的观点就是，用<code>Multidex</code>，最好检测一下代码，精简一下依赖，或者使用<a href="http://developer.android.com/tools/help/proguard.html" target="_blank" rel="external">ProGuard</a>混淆代码，剔去掉不需要的引用。</p>
+<p>首先复现一下这个”65536”问题，很简单，建一个工程，然后一脑门地添加各种乱七八糟的依赖，</p>
+<p><img src="http://i1.tietuku.com/1ff2c42573e52e93.jpg" alt="添加大量依赖"></p>
+<p>然后编译运行一下，之后就是妥妥地跪了，</p>
+<p><img src="http://i1.tietuku.com/2c8b2c146e045daa.jpg" alt="65536异常"></p>
+<p>并不一定是上面的错误信息，根据Google说的：</p>
+<blockquote>
+<p>Both these error conditions display a common number: 65,536. This number is significant in that it represents the total number of references that can be invoked by the code within a single Dalvik Executable (dex) bytecode file. If you have built an Android app and received this error, then congratulations, you have a lot of code! This document explains how to move past this limitation and continue building your app.</p>
+</blockquote>
+<p>不同平台版本，”65536”问题的错误提示不尽相同，不过有一个共同点，就是会出现<code>65536</code>这个数字，只要出现了这个数字，九成是方法数超了。</p>
+<p>启用Multidex需要<code>Android SDK Build Tools 21.1</code>或以上版本，<br>而Multidex是<code>support</code>支持库的内容,所以在SDK Manager中，需要下载<code>Extras</code>中的<code>Android Support Repository</code>和<code>Android Support Library</code>(估计也没人会不下载这俩货，否则怎么做开发)。</p>
+<p>下面开始启用<code>Multidex</code>，先在gradle添加<code>Multidex support依赖</code>，还有添加<code>multiDexEnabled true</code>语句启用multidex，</p>
+<p><img src="http://i1.tietuku.com/11b06388d0fe532d.jpg" alt="启用multidex"></p>
+<figure class="highlight lasso"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">android &#123;</span><br><span class="line">	<span class="attribute">...</span></span><br><span class="line"></span><br><span class="line">    defaultConfig &#123;</span><br><span class="line">	<span class="attribute">...</span></span><br><span class="line">        <span class="comment">// 启用多dex支持</span></span><br><span class="line">        multiDexEnabled <span class="literal">true</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">dependencies &#123;</span><br><span class="line">	<span class="attribute">...</span></span><br><span class="line">    compile <span class="string">'com.android.support:multidex:1.0.0'</span> <span class="comment">// 不一定是这个版本</span></span><br><span class="line">	<span class="attribute">...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>最后一步分三种情况(参考<a href="http://developer.android.com/reference/android/support/multidex/MultiDexApplication.html" target="_blank" rel="external">这里</a>):</p>
+<ol>
+<li>在<code>AndroidManifest.xml</code>文件中，把<code>application</code>定义为<code>android.support.multidex.MultiDexApplication</code>。</li>
+<li>自定义Application类，继承<code>android.support.multidex.MultiDexApplication</code>，再配置<code>application</code>为自定义的类。</li>
+<li>如果之前已经继承了其他<code>Application</code>类，可以重写<code>attachBaseContext()</code>方法，并添加语句<code>MultiDex.install(this);</code>，如下：</li>
+</ol>
+<p><img src="http://i4.tietuku.com/45582c0f0716b471.jpg" alt="继承其他Application"></p>
+<p>修改完毕，重新编译运行app成功，apk中有两个dex文件，</p>
+<p><img src="http://i1.tietuku.com/3fdb3d1db34b5db0.jpg" alt="multidex"></p>
+<p>启用Multidex的步骤就这么点，很简单的，不过启用Multidex实属无奈，能不能就不用吧。</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>有朋友问，App引用的库太多，方法数超过65536后无法编译。<br>其实就是众所周知的单个dex里面不能有超过65536个方法问题。</p>
+<p>不知道什么时候开始，Android开发者主页就给出了解决方法的专题页面（需要科学上网）。</p>
+<blockquote>
+<p><a href="http://developer.android.com/tools/building/multidex.html">http://developer.android.com/tools/building/multidex.html</a><br>]]>
+    
+    </summary>
+    
+      <category term="Gradle" scheme="http://licheedev.com/tags/Gradle/"/>
+    
+      <category term="Android" scheme="http://licheedev.com/categories/Android/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[【转载】Android 开发最佳实践]]></title>
+    <link href="http://licheedev.com/2015/05/21/android-best-practices/"/>
+    <id>http://licheedev.com/2015/05/21/android-best-practices/</id>
+    <published>2015-05-20T16:27:36.000Z</published>
+    <updated>2015-06-12T15:58:45.914Z</updated>
+    <content type="html"><![CDATA[<blockquote>
+<p><strong>原文转载自 <a href="https://github.com/futurice/android-best-practices" target="_blank" rel="external">android-best-practices</a> 项目，中文由 <a href="https://github.com/andyiac" target="_blank" rel="external">@andyiac</a> 翻译</strong><br><strong>原文地址</strong><br><strong><a href="https://github.com/futurice/android-best-practices/blob/master/translations/Chinese/README.cn.md" target="_blank" rel="external">https://github.com/futurice/android-best-practices/blob/master/translations/Chinese/README.cn.md</a></strong></p>
+</blockquote>
+<h1 id="Android_开发最佳实践">Android 开发最佳实践</h1><p>从<a href="http://www.futurice.com" target="_blank" rel="external">Futurice</a>公司Android开发者中学到的经验。<br>遵循以下准则，避免重复发明轮子。若您对开发iOS或Windows Phone 有兴趣，<br>请看<a href="https://github.com/futurice/ios-good-practices" target="_blank" rel="external"><strong>iOS Good Practices</strong></a> 和 <a href="https://github.com/futurice/win-client-dev-good-practices" target="_blank" rel="external"><strong>Windows client Good Practices</strong></a> 这两篇文章。<br><a id="more"></a></p>
+<h2 id="摘要">摘要</h2><ul>
+<li>使用 Gradle 和它推荐的工程结构</li>
+<li>把密码和敏感数据放在gradle.properties</li>
+<li>不要自己写 HTTP 客户端,使用Volley或OkHttp库</li>
+<li>使用Jackson库解析JSON数据</li>
+<li>避免使用Guava同时使用一些类库来避免<em>65k method limit</em>（一个Android程序中最多能执行65536个方法）</li>
+<li>使用 Fragments来呈现UI视图</li>
+<li>使用 Activities 只是为了管理 Fragments</li>
+<li>Layout 布局是 XMLs代码，组织好它们</li>
+<li>在layoutout XMLs布局时，使用styles文件来避免使用重复的属性</li>
+<li>使用多个style文件来避免单一的一个大style文件</li>
+<li>保持你的colors.xml 简短DRY(不要重复自己)，只是定义调色板</li>
+<li>总是使用dimens.xml DRY(不要重复自己)，定义通用常数</li>
+<li>不要做一个深层次的ViewGroup</li>
+<li>在使用WebViews时避免在客户端做处理，当心内存泄露</li>
+<li>使用Robolectric单元测试，Robotium 做UI测试</li>
+<li>使用Genymotion 作为你的模拟器</li>
+<li>总是使用ProGuard 和 DexGuard混淆来项目</li>
+</ul>
+<h3 id="Android_SDK">Android SDK</h3><p>将你的<a href="https://developer.android.com/sdk/installing/index.html?pkg=tools" target="_blank" rel="external">Android SDK</a>放在你的home目录或其他应用程序无关的位置。<br>当安装有些包含SDK的IDE的时候，可能会将SDK放在IDE同一目录下，当你需要升级（或重新安装）IDE或更换的IDE时，会非常麻烦。<br>此外，若果你的IDE是在普通用户，不是在root下运行，还要避免吧SDK放到一下需要sudo权限的系统级别目录下。</p>
+<h3 id="构建系统">构建系统</h3><p>你的默认编译环境应该是<a href="http://tools.android.com/tech-docs/new-build-system" target="_blank" rel="external">Gradle</a>.<br>Ant 有很多限制，也很冗余。使用Gradle，完成以下工作很方便：</p>
+<ul>
+<li>构建APP不同版本的变种</li>
+<li>制作简单类似脚本的任务</li>
+<li>管理和下载依赖</li>
+<li>自定义秘钥</li>
+<li>更多</li>
+</ul>
+<p>同时，Android Gradle插件作为新标准的构建系统正在被Google积极的开发。</p>
+<h3 id="工程结构">工程结构</h3><p>有两种流行的结构：老的Ant &amp; Eclipse ADT 工程结构，和新的Gradle &amp; Android Studio 工程结构，<br>你应该选择新的工程结构，如果你的工程还在使用老的结构，考虑放弃吧，将工程移植到新的结构。</p>
+<p>老的结构:</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">old-structure</span><br><span class="line">├─ assets</span><br><span class="line">├─ libs</span><br><span class="line">├─ res</span><br><span class="line">├─ src</span><br><span class="line">│  └─ com/futurice/project</span><br><span class="line">├─ AndroidManifest<span class="class">.xml</span></span><br><span class="line">├─ build<span class="class">.gradle</span></span><br><span class="line">├─ project<span class="class">.properties</span></span><br><span class="line">└─ proguard-rules.pro</span><br></pre></td></tr></table></figure>
+<p>新的结构</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">new-structure</span><br><span class="line">├─ library-foobar</span><br><span class="line">├─ app</span><br><span class="line">│  ├─ libs</span><br><span class="line">│  ├─ src</span><br><span class="line">│  │  ├─ androidTest</span><br><span class="line">│  │  │  └─ java</span><br><span class="line">│  │  │     └─ com/futurice/project</span><br><span class="line">│  │  └─ main</span><br><span class="line">│  │     ├─ java</span><br><span class="line">│  │     │  └─ com/futurice/project</span><br><span class="line">│  │     ├─ res</span><br><span class="line">│  │     └─ AndroidManifest<span class="class">.xml</span></span><br><span class="line">│  ├─ build<span class="class">.gradle</span></span><br><span class="line">│  └─ proguard-rules<span class="class">.pro</span></span><br><span class="line">├─ build<span class="class">.gradle</span></span><br><span class="line">└─ settings.gradle</span><br></pre></td></tr></table></figure>
+<p>主要的区别在于，新的结构明确的分开了’source sets’ (<code>main</code>,<code>androidTest</code>)，Gradle的一个理念。<br>你可以做到，例如，添加源组‘paid’和‘free’在src中，这将成为您的应用程序的付费和免费的两种模式的源代码。</p>
+<p>你的项目引用第三方项目库时（例如，library-foobar），拥有一个顶级包名<code>app</code>从第三方库项目区分你的应用程序是非常有用的。<br>然后<code>settings.gradle</code>不断引用这些库项目，其中<code>app/build.gradle</code>可以引用。</p>
+<h3 id="Gradle_配置">Gradle 配置</h3><p><strong>常用结构</strong> 参考<a href="http://tools.android.com/tech-docs/new-build-system/user-guide" target="_blank" rel="external">Google’s guide on Gradle for Android</a></p>
+<p><strong>小任务</strong> 除了(shell, Python, Perl, etc)这些脚本语言，你也可以使用Gradle 制作任务。<br>更多信息请参考<a href="http://www.gradle.org/docs/current/userguide/userguide_single.html#N10CBF" target="_blank" rel="external">Gradle’s documentation</a>。</p>
+<p><strong>密码</strong> 在做版本release时你app的 <code>build.gradle</code>你需要定义 <code>signingConfigs</code>.此时你应该避免以下内容：</p>
+<p><em>不要做这个</em> . 这会出现在版本控制中。</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">signingConfigs &#123;</span><br><span class="line">	release &#123;</span><br><span class="line">		storeFile file(<span class="string">"myapp.keystore"</span>)</span><br><span class="line">		storePassword <span class="string">"password123"</span></span><br><span class="line">		keyAlias <span class="string">"thekey"</span></span><br><span class="line">		keyPassword <span class="string">"password789"</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>而是，建立一个不加入版本控制系统的<code>gradle.properties</code>文件。</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="setting">KEYSTORE_PASSWORD=<span class="value">password123</span></span></span><br><span class="line"><span class="setting">KEY_PASSWORD=<span class="value">password789</span></span></span><br></pre></td></tr></table></figure>
+<p>那个文件是gradle自动引入的，你可以在<code>buld.gradle</code>文件中使用，例如：</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">signingConfigs &#123;</span><br><span class="line">	release &#123;</span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">			storeFile file(<span class="string">"myapp.keystore"</span>)</span><br><span class="line">			storePassword KEYSTORE_PASSWORD</span><br><span class="line">			keyAlias <span class="string">"thekey"</span></span><br><span class="line">			keyPassword KEY_PASSWORD</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">catch</span> (ex) &#123;</span><br><span class="line">			<span class="keyword">throw</span> <span class="keyword">new</span> InvalidUserDataException(<span class="string">"You should define KEYSTORE_PASSWORD and KEY_PASSWORD in gradle.properties."</span>)</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>使用 Maven 依赖方案代替使用导入jar包方案</strong> 如果在你的项目中你明确使用率<br>jar文件，那么它们可能成为永久的版本，如<code>2.1.1</code>.下载jar包更新他们是很繁琐的，<br>这个问题Maven很好的解决了，这在Android Gradle构建中也是推荐的方法。你可<br>以指定版本的一个范围，如<code>2.1.+</code>,然后Maven会自动升级到制定的最新版本，例如：</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">dependencies &#123;</span><br><span class="line">	compile <span class="string">'com.netflix.rxjava:rxjava-core:0.19.+'</span></span><br><span class="line">	compile <span class="string">'com.netflix.rxjava:rxjava-android:0.19.+'</span></span><br><span class="line">	compile <span class="string">'com.fasterxml.jackson.core:jackson-databind:2.4.+'</span></span><br><span class="line">	compile <span class="string">'com.fasterxml.jackson.core:jackson-core:2.4.+'</span></span><br><span class="line">	compile <span class="string">'com.fasterxml.jackson.core:jackson-annotations:2.4.+'</span></span><br><span class="line">	compile <span class="string">'com.squareup.okhttp:okhttp:2.0.+'</span></span><br><span class="line">	compile <span class="string">'com.squareup.okhttp:okhttp-urlconnection:2.0.+'</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="IDEs_and_text_editors">IDEs and text editors</h3><h3 id="IDE集成开发环境和文本编辑器">IDE集成开发环境和文本编辑器</h3><p><strong>无论使用什么编辑器，一定要构建一个良好的工程结构</strong> 编辑器每个人都有自己的<br>选择，让你的编辑器根据工程结构和构建系统运作，那是你自己的责任。</p>
+<p>当下首推<a href="https://developer.android.com/sdk/installing/studio.html" target="_blank" rel="external">Android Studio</a>,因为他是由谷歌开发，最接近Gradle，默认使用最新的工程结构，已经到beta阶段<br>（目前已经有release 1.0了），它就是为Android开发定制的。</p>
+<p>你也可以使用<a href="https://developer.android.com/sdk/installing/index.html?pkg=adt" target="_blank" rel="external">Eclipse ADT</a> ，但是你需要对它进行配置，因为它使用了旧的工程结构<br>和Ant作为构建系统。你甚至可以使用纯文版编辑器如Vim，Sublime Text，或者Emacs。如果那样的话，你需要使用Gardle和<code>adb</code>命令行。如果使用Eclipse集成Gradle<br>不适合你，你只是使用命令行构建工程，或迁移到Android Studio中来吧。</p>
+<p>无论你使用何种开发工具，只要确保Gradle和新的项目结构保持官方的方式构建应用程序，避免你的编辑器配置文件加入到版本控制。例如，避免加入Ant <code>build.xml</code>文件。<br>特别如果你改变Ant的配置，不要忘记保持<code>build.gradle</code>是最新和起作用的。同时，善待其他开发者，不要强制改变他们的开发工具和偏好。</p>
+<h3 id="类库">类库</h3><p><strong><a href="http://wiki.fasterxml.com/JacksonHome" target="_blank" rel="external">Jackson</a></strong> 是一个将java对象转换成JSON与JSON转化java类的类库。<a href="https://code.google.com/p/google-gson/" target="_blank" rel="external">Gson</a><br>是解决这个问题的流行方案，然而我们发现Jackson更高效,因为它支持替代的方法处理JSON:流、内存树模型,和传统JSON-POJO数据绑定。不过，请记住，<br>Jsonkson库比起GSON更大，所以根据你的情况选择，你可能选择GSON来避免APP 65k个方法限制。其它选择: <a href="https://code.google.com/p/json-smart/" target="_blank" rel="external">Json-smart</a> and <a href="https://github.com/RichardHightower/boon/wiki/Boon-JSON-in-five-minutes" target="_blank" rel="external">Boon JSON</a></p>
+<p><strong>网络请求，缓存，图片</strong> 执行请求后端服务器，有几种交互的解决方案，你应该考虑实现你自己的网络客户端。使用 <a href="https://android.googlesource.com/platform/frameworks/volley" target="_blank" rel="external">Volley</a><br>或<a href="http://square.github.io/retrofit/" target="_blank" rel="external">Retrofit</a>。Volley 同时提供图片缓存类。若果你选择使用Retrofit,那么考虑使用<a href="http://square.github.io/picasso/" target="_blank" rel="external">Picasso</a><br>来加载图片和缓存，同时使用<a href="http://square.github.io/okhttp/" target="_blank" rel="external">OkHttp</a>作为高效的网络请求。Retrofit，Picasso和OkHttp都是有同一家公司开发（注：<br>是由<a href="https://github.com/square" target="_blank" rel="external">Square</a> 公司开发），所以它们能很好的在一起运行。<a href="http://stackoverflow.com/questions/24375043/how-to-implement-android-volley-with-okhttp-2-0/24951835#24951835" target="_blank" rel="external">OkHttp 同样可以和Volley在一起使用 Volley</a>.</p>
+<p><strong>RxJava</strong> 是函数式反应性的一个类库，换句话说，能处理异步的事件。<br>这是一个强大的和有前途的模式，同时也可能会造成混淆，因为它是如此的不同。<br>我们建议在使用这个库架构整个应用程序之前要谨慎考虑。<br>有一些项目是使用RxJava完成的，如果你需要帮助可以跟这些人取得联系：<br>Timo Tuominen, Olli Salonen, Andre Medeiros, Mark Voit, Antti Lammi, Vera Izrailit, Juha Ristolainen.<br>我们也写了一些博客：<br><a href="http://blog.futurice.com/tech-pick-of-the-week-rx-for-net-and-rxjava-for-android" target="_blank" rel="external">[1]</a>, <a href="http://blog.futurice.com/top-7-tips-for-rxjava-on-android" target="_blank" rel="external">[2]</a>,<br><a href="https://gist.github.com/staltz/868e7e9bc2a7b8c1f754" target="_blank" rel="external">[3]</a>,<br><a href="http://blog.futurice.com/android-development-has-its-own-swift" target="_blank" rel="external">[4]</a>.</p>
+<p>如若你之前有使用过Rx的经历，开始从API响应应用它。<br>另外，从简单的UI事件处理开始运用，如单击事件或在搜索栏输入事件。<br>若对你的Rx技术有信心，同时想要将它应用到你的整体架构中，那么请在复杂的部分写好Javadocs文档。<br>请记住其他不熟悉RxJava的开发人员，可能会非常难理解整个项目。<br>尽你的的全力帮助他们理解你的代码和Rx。</p>
+<p><strong><a href="https://github.com/evant/gradle-retrolambda" target="_blank" rel="external">Retrolambda</a></strong> 是一个在Android和预JDK8平台上的使用Lambda表达式语法的Java类库。<br>它有助于保持你代码的紧凑性和可读性，特别当你使用如RxJava函数风格编程时。<br>使用它时先安装JDK8，在Android Studio工程结构对话框中把它设置成为SDK路径，同时设置<code>JAVA8_HOME</code>和<code>JAVA7_HOME</code>环境变量，<br>然后在工程根目录下配置 build.gradle：</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">dependencies &#123;</span><br><span class="line">	classpath <span class="string">'me.tatarka:gradle-retrolambda:2.4.+'</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>同时在每个module 的build.gradle中添加</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">apply <span class="string">plugin:</span> <span class="string">'retrolambda'</span></span><br><span class="line"></span><br><span class="line">android &#123;</span><br><span class="line">	compileOptions &#123;</span><br><span class="line">	sourceCompatibility JavaVersion.VERSION_1_8</span><br><span class="line">	targetCompatibility JavaVersion.VERSION_1_8</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">retrolambda &#123;</span><br><span class="line">	jdk System.getenv(<span class="string">"JAVA8_HOME"</span>)</span><br><span class="line">	oldJdk System.getenv(<span class="string">"JAVA7_HOME"</span>)</span><br><span class="line">	javaVersion JavaVersion.VERSION_1_7</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Android Studio 提供Java8 lambdas表带是代码提示支持。如果你对lambdas不熟悉，只需参照以下开始学习吧：</p>
+<ul>
+<li>任何只包含一个接口的方法都是”lambda friendly”同时代码可以被折叠成更紧凑的语法</li>
+<li>如果对参数或类似有疑问，就写一个普通的匿名内部类，然后让Android Status为你生成一个lambda。</li>
+</ul>
+<p><strong>当心dex方法数限制，同时避免使用过多的类库</strong> Android apps，当打包成一个dex文件时，有一个65535个应用方法强硬限制<a href="https://medium.com/@rotxed/dex-skys-the-limit-no-65k-methods-is-28e6cb40cf71" target="_blank" rel="external">[1]</a> <a href="http://blog.persistent.info/2014/05/per-package-method-counts-for-androids.html" target="_blank" rel="external">[2]</a> <a href="http://jakewharton.com/play-services-is-a-monolith/" target="_blank" rel="external">[3]</a>。<br>当你突破65k限制之后你会看到一个致命错误。因此，使用一个正常范围的类库文件，同时使用<a href="https://github.com/mihaip/dex-method-counts" target="_blank" rel="external">dex-method-counts</a><br>工具来决定哪些类库可以再65k限制之下使用，特别的避免使用Guava类库，因为它包含超过13k个方法。</p>
+<h3 id="Activities_and_Fragments">Activities and Fragments</h3><p><a href="http://developer.android.com/guide/components/fragments.html" target="_blank" rel="external">Fragments</a>应该作为你实现UI界面默认选择。你可以重复使用Fragments用户接口来<br>组合成你的应用。我们强烈推荐使用Fragments而不是activity来呈现UI界面，理由如下：</p>
+<ul>
+<li><p><strong>提供多窗格布局解决方案</strong> Fragments 的引入主要将手机应用延伸到平板电脑，所以在平板电脑上你可能有A、B两个窗格，但是在手机应用上A、B可能分别充满<br>整个屏幕。如果你的应用在最初就使用了fragments，那么以后将你的应用适配到其他不同尺寸屏幕就会非常简单。</p>
+</li>
+<li><p><strong>屏幕间数据通信</strong> 从一个Activity发送复杂数据(例如Java对象)到另外一个Activity，Android的API并没有提供合适的方法。不过使用Fragment，你可以使用<br>一个activity实例作为这个activity子fragments的通信通道。即使这样比Activity与Activity间的通信好，你也想考虑使用Event Bus架构，使用如<br><a href="https://square.github.io/otto/" target="_blank" rel="external">Otto</a> 或者 <a href="https://github.com/greenrobot/EventBus" target="_blank" rel="external">greenrobot EventBus</a>作为更简洁的实现。<br>如果你希望避免添加另外一个类库，RxJava同样可以实现一个Event Bus。</p>
+</li>
+</ul>
+<ul>
+<li><p><strong>Fragments 一般通用的不只有UI</strong> 你可以有一个没有界面的fragment作为Activity提供后台工作。<br>进一步你可以使用这个特性来创建一个<a href="http://stackoverflow.com/questions/12363790/how-many-activities-vs-fragments/12528434#12528434" target="_blank" rel="external">fragment 包含改变其它fragment的逻辑</a><br>而不是把这个逻辑放在activity中。</p>
+</li>
+<li><p><strong>甚至ActionBar 都可以使用内部fragment来管理</strong> 你可以选择使用一个没有UI界面的fragment来专门管理ActionBar,或者你可以选择使用在每个Fragment中<br>添加它自己的action 来作为父Activity的ActionBar.<a href="http://www.grokkingandroid.com/adding-action-items-from-within-fragments/" target="_blank" rel="external">参考</a>.</p>
+</li>
+</ul>
+<p>很不幸，我们不建议广泛的使用嵌套的<a href="https://developer.android.com/about/versions/android-4.2.html#NestedFragments" target="_blank" rel="external">fragments</a>，因为<br>有时会引起<a href="http://delyan.me/android-s-matryoshka-problem/" target="_blank" rel="external">matryoshka bugs</a>。我们只有当它有意义(例如，在水平滑动的ViewPager在<br>像屏幕一样fragment中)或者他的确是一个明智的选择的时候才广泛的使用fragment。</p>
+<p>在一个架构级别，你的APP应该有一个顶级的activity来包含绝大部分业务相关的fragment。你也可能还有一些辅助的activity ，这些辅助的activity与主activity<br>通信很简单限制在这两种方法<br><a href="http://developer.android.com/reference/android/content/Intent.html#setData(android.net.Uri" target="_blank" rel="external"><code>Intent.setData()</code></a>) 或 <a href="http://developer.android.com/reference/android/content/Intent.html#setAction(java.lang.String" target="_blank" rel="external"><code>Intent.setAction()</code></a>)或类似的方法。</p>
+<h3 id="Java_包结构">Java 包结构</h3><p>Android 应用程序在架构上大致是Java中的<a href="http://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller" target="_blank" rel="external">Model-View-Controller</a>结构。<br>在Android 中 Fragment和Activity通常上是控制器类(<a href="http://www.informit.com/articles/article.aspx?p=2126865" target="_blank" rel="external">http://www.informit.com/articles/article.aspx?p=2126865</a>).<br>换句话说，他们是用户接口的部分，同样也是Views视图的部分。</p>
+<p>正是因为如此，才很难严格的将fragments (或者 activities) 严格的划分成 控制器controlloers还是视图 views。<br>最还是将它们放在自己单独的 <code>fragments</code> 包中。只要你遵循之前提到的建议，Activities 则可以放在顶级目录下。<br>若果你规划有2到3个以上的activity，那么还是同样新建一个<code>activities</code>包吧。</p>
+<p>然而，这种架构可以看做是另一种形式的MVC，<br>包含要被解析API响应的JSON数据，来填充的POJO的<code>models</code>包中。<br>和一个<code>views</code>包来包含你的自定义视图、通知、导航视图，widgets等等。<br>适配器Adapter是在数据和视图之间。然而他们通常需要通过<code>getView()</code>方法来导出一些视图，<br>所以你可以将<code>adapters</code>包放在<code>views</code>包里面。</p>
+<p>一些控制器角色的类是应用程序级别的，同时是接近系统的。<br>这些类放在<code>managers</code>包下面。<br>一些繁杂的数据处理类，比如说”DateUtils”,放在<code>utils</code>包下面。<br>与后端交互负责网络处理类，放在<code>network</code>包下面。</p>
+<p>总而言之，以最接近用户而不是最接近后端去安排他们。</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">com<span class="class">.futurice</span><span class="class">.project</span></span><br><span class="line">├─ network</span><br><span class="line">├─ models</span><br><span class="line">├─ managers</span><br><span class="line">├─ utils</span><br><span class="line">├─ fragments</span><br><span class="line">└─ views</span><br><span class="line">   ├─ adapters</span><br><span class="line">   ├─ actionbar</span><br><span class="line">   ├─ widgets</span><br><span class="line">   └─ notifications</span><br></pre></td></tr></table></figure>
+<h3 id="资源文件_Resources">资源文件 Resources</h3><ul>
+<li><strong>命名</strong> 遵循前缀表明类型的习惯，形如<code>type_foo_bar.xml</code>。例如：<code>fragment_contact_details.xml</code>,<code>view_primary_button.xml</code>,<code>activity_main.xml</code>.</li>
+</ul>
+<p><strong>组织布局文件</strong> 若果你不确定如何排版一个布局文件，遵循一下规则可能会有帮助。</p>
+<ul>
+<li>每一个属性一行，缩进4个空格</li>
+<li><code>android:id</code> 总是作为第一个属性</li>
+<li><code>android:layout_****</code> 属性在上边</li>
+<li><code>style</code> 属性在底部</li>
+<li>关闭标签<code>/&gt;</code>单独起一行，有助于调整和添加新的属性</li>
+<li>考虑使用<a href="http://tools.android.com/tips/layout-designtime-attributes" target="_blank" rel="external">Designtime attributes 设计时布局属性</a>，Android Studio已经提供支持，而不是硬编码<code>android:text</code><br>(译者注：墙内也可以参考stormzhang的这篇博客<a href="http://stormzhang.com/devtools/2015/01/11/android-studio-tips1/" target="_blank" rel="external">链接</a>)。</li>
+</ul>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="pi">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">LinearLayout</span></span><br><span class="line">	<span class="attribute">xmlns:android</span>=<span class="value">"http://schemas.android.com/apk/res/android"</span></span><br><span class="line">	<span class="attribute">xmlns:tools</span>=<span class="value">"http://schemas.android.com/tools"</span></span><br><span class="line">	<span class="attribute">android:layout_width</span>=<span class="value">"match_parent"</span></span><br><span class="line">	<span class="attribute">android:layout_height</span>=<span class="value">"match_parent"</span></span><br><span class="line">	<span class="attribute">android:orientation</span>=<span class="value">"vertical"</span></span><br><span class="line">	&gt;</span></span><br><span class="line"></span><br><span class="line">	<span class="tag">&lt;<span class="title">TextView</span></span><br><span class="line">		<span class="attribute">android:id</span>=<span class="value">"@+id/name"</span></span><br><span class="line">		<span class="attribute">android:layout_width</span>=<span class="value">"match_parent"</span></span><br><span class="line">		<span class="attribute">android:layout_height</span>=<span class="value">"wrap_content"</span></span><br><span class="line">		<span class="attribute">android:layout_alignParentRight</span>=<span class="value">"true"</span></span><br><span class="line">		<span class="attribute">android:text</span>=<span class="value">"@string/name"</span></span><br><span class="line">		<span class="attribute">style</span>=<span class="value">"@style/FancyText"</span></span><br><span class="line">		/&gt;</span></span><br><span class="line"></span><br><span class="line">	<span class="tag">&lt;<span class="title">include</span> <span class="attribute">layout</span>=<span class="value">"@layout/reusable_part"</span> /&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="title">LinearLayout</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>作为一个经验法则,<code>android:layout_****</code>属性应该在 layout XML 中定义,同时其它属性<code>android:****</code> 应放在 styler XML中。此规则也有例外，不过大体工作<br>的很好。这个思想整体是保持layout属性(positioning, margin, sizing) 和content属性在布局文件中，同时将所有的外观细节属性（colors, padding, font）放<br>在style文件中。</p>
+<p>例外有以下这些:</p>
+<ul>
+<li><code>android:id</code> 明显应该在layout文件中</li>
+<li>layout文件中<code>android:orientation</code>对于一个<code>LinearLayout</code>布局通常更有意义</li>
+<li><code>android:text</code> 由于是定义内容，应该放在layout文件中</li>
+<li>有时候将<code>android:layout_width</code> 和 <code>android:layout_height</code>属性放到一个style中作为一个通用的风格中更有意义，但是默认情况下这些应该放到layout文件中。</li>
+</ul>
+<p><strong>使用styles</strong> 几乎每个项目都需要适当的使用style文件，因为对于一个视图来说有一个重复的外观是很常见的。<br>在应用中对于大多数文本内容，最起码你应该有一个通用的style文件，例如：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">style</span> <span class="attribute">name</span>=<span class="value">"ContentText"</span>&gt;</span><span class="css"></span><br><span class="line">	&lt;<span class="tag">item</span> <span class="tag">name</span>="<span class="rule"><span class="attribute">android</span>:<span class="value">textSize<span class="string">"&gt;@dimen/font_normal&lt;/item&gt;</span><br><span class="line">	&lt;item name="</span>android:textColor<span class="string">"&gt;@color/basic_black&lt;/item&gt;</span><br><span class="line"></span></span></span></span><span class="tag">&lt;/<span class="title">style</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>应用到TextView 中:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">TextView</span></span><br><span class="line">	<span class="attribute">android:layout_width</span>=<span class="value">"wrap_content"</span></span><br><span class="line">	<span class="attribute">android:layout_height</span>=<span class="value">"wrap_content"</span></span><br><span class="line">	<span class="attribute">android:text</span>=<span class="value">"@string/price"</span></span><br><span class="line">	<span class="attribute">style</span>=<span class="value">"@style/ContentText"</span></span><br><span class="line">	/&gt;</span></span><br></pre></td></tr></table></figure>
+<p>你或许需要为按钮控件做同样的事情，不要停止在那里。将一组相关的和重复<code>android:****</code>的属性放到一个通用的style中。</p>
+<p><strong>将一个大的style文件分割成多个文件</strong> 你可以有多个<code>styles.xml</code> 文件。Android SDK支持其它文件，<code>styles</code>这个文件名称并没有作用，起作用的是在文件<br>里xml的<code>&lt;style&gt;</code>标签。因此你可以有多个style文件<code>styles.xml</code>,<code>style_home.xml</code>,<code>style_item_details.xml</code>,<code>styles_forms.xml</code>。<br>不用于资源文件路径需要为系统构建起的有意义，在<code>res/values</code>目录下的文件可以任意命名。</p>
+<p><strong><code>colors.xml</code>是一个调色板</strong> 在你的<code>colors.xml</code>文件中应该只是映射颜色的名称一个RGBA值，而没有其它的。不要使用它为不同的按钮来定义RGBA值。</p>
+<p><em>不要这样做</em></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">resources</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">color</span> <span class="attribute">name</span>=<span class="value">"button_foreground"</span>&gt;</span>#FFFFFF<span class="tag">&lt;/<span class="title">color</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">color</span> <span class="attribute">name</span>=<span class="value">"button_background"</span>&gt;</span>#2A91BD<span class="tag">&lt;/<span class="title">color</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">color</span> <span class="attribute">name</span>=<span class="value">"comment_background_inactive"</span>&gt;</span>#5F5F5F<span class="tag">&lt;/<span class="title">color</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">color</span> <span class="attribute">name</span>=<span class="value">"comment_background_active"</span>&gt;</span>#939393<span class="tag">&lt;/<span class="title">color</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">color</span> <span class="attribute">name</span>=<span class="value">"comment_foreground"</span>&gt;</span>#FFFFFF<span class="tag">&lt;/<span class="title">color</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">color</span> <span class="attribute">name</span>=<span class="value">"comment_foreground_important"</span>&gt;</span>#FF9D2F<span class="tag">&lt;/<span class="title">color</span>&gt;</span></span><br><span class="line">	...</span><br><span class="line">	<span class="tag">&lt;<span class="title">color</span> <span class="attribute">name</span>=<span class="value">"comment_shadow"</span>&gt;</span>#323232<span class="tag">&lt;/<span class="title">color</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>使用这种格式，你会非常容易的开始重复定义RGBA值，这使如果需要改变基本色变的很复杂。同时，这些定义是跟一些环境关联起来的，如<code>button</code>或者<code>comment</code>,<br>应该放到一个按钮风格中，而不是在<code>color.xml</code>文件中。</p>
+<p>相反，这样做:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">resources</span>&gt;</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">&lt;!-- grayscale --&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">color</span> <span class="attribute">name</span>=<span class="value">"white"</span>     &gt;</span>#FFFFFF<span class="tag">&lt;/<span class="title">color</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">color</span> <span class="attribute">name</span>=<span class="value">"gray_light"</span>&gt;</span>#DBDBDB<span class="tag">&lt;/<span class="title">color</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">color</span> <span class="attribute">name</span>=<span class="value">"gray"</span>      &gt;</span>#939393<span class="tag">&lt;/<span class="title">color</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">color</span> <span class="attribute">name</span>=<span class="value">"gray_dark"</span> &gt;</span>#5F5F5F<span class="tag">&lt;/<span class="title">color</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">color</span> <span class="attribute">name</span>=<span class="value">"black"</span>     &gt;</span>#323232<span class="tag">&lt;/<span class="title">color</span>&gt;</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">&lt;!-- basic colors --&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">color</span> <span class="attribute">name</span>=<span class="value">"green"</span>&gt;</span>#27D34D<span class="tag">&lt;/<span class="title">color</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">color</span> <span class="attribute">name</span>=<span class="value">"blue"</span>&gt;</span>#2A91BD<span class="tag">&lt;/<span class="title">color</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">color</span> <span class="attribute">name</span>=<span class="value">"orange"</span>&gt;</span>#FF9D2F<span class="tag">&lt;/<span class="title">color</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">color</span> <span class="attribute">name</span>=<span class="value">"red"</span>&gt;</span>#FF432F<span class="tag">&lt;/<span class="title">color</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="title">resources</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>向应用设计者那里要这个调色板，名称不需要跟”green”, “blue”, 等等相同。<br>“brand_primary”, “brand_secondary”, “brand_negative” 这样的名字也是完全可以接受的。<br>像这样规范的颜色很容易修改或重构，会使应用一共使用了多少种不同的颜色变得非常清晰。<br>通常一个具有审美价值的UI来说，减少使用颜色的种类是非常重要的。</p>
+<p><strong>像对待colors.xml一样对待dimens.xml文件</strong> 与定义颜色调色板一样，你同时也应该定义一个空隙间隔和字体大小的“调色板”。<br>一个好的例子，如下所示：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">resources</span>&gt;</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">&lt;!-- font sizes --&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">dimen</span> <span class="attribute">name</span>=<span class="value">"font_larger"</span>&gt;</span>22sp<span class="tag">&lt;/<span class="title">dimen</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">dimen</span> <span class="attribute">name</span>=<span class="value">"font_large"</span>&gt;</span>18sp<span class="tag">&lt;/<span class="title">dimen</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">dimen</span> <span class="attribute">name</span>=<span class="value">"font_normal"</span>&gt;</span>15sp<span class="tag">&lt;/<span class="title">dimen</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">dimen</span> <span class="attribute">name</span>=<span class="value">"font_small"</span>&gt;</span>12sp<span class="tag">&lt;/<span class="title">dimen</span>&gt;</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">&lt;!-- typical spacing between two views --&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">dimen</span> <span class="attribute">name</span>=<span class="value">"spacing_huge"</span>&gt;</span>40dp<span class="tag">&lt;/<span class="title">dimen</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">dimen</span> <span class="attribute">name</span>=<span class="value">"spacing_large"</span>&gt;</span>24dp<span class="tag">&lt;/<span class="title">dimen</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">dimen</span> <span class="attribute">name</span>=<span class="value">"spacing_normal"</span>&gt;</span>14dp<span class="tag">&lt;/<span class="title">dimen</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">dimen</span> <span class="attribute">name</span>=<span class="value">"spacing_small"</span>&gt;</span>10dp<span class="tag">&lt;/<span class="title">dimen</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">dimen</span> <span class="attribute">name</span>=<span class="value">"spacing_tiny"</span>&gt;</span>4dp<span class="tag">&lt;/<span class="title">dimen</span>&gt;</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">&lt;!-- typical sizes of views --&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">dimen</span> <span class="attribute">name</span>=<span class="value">"button_height_tall"</span>&gt;</span>60dp<span class="tag">&lt;/<span class="title">dimen</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">dimen</span> <span class="attribute">name</span>=<span class="value">"button_height_normal"</span>&gt;</span>40dp<span class="tag">&lt;/<span class="title">dimen</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">dimen</span> <span class="attribute">name</span>=<span class="value">"button_height_short"</span>&gt;</span>32dp<span class="tag">&lt;/<span class="title">dimen</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="title">resources</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>布局时在写 margins 和 paddings 时，你应该使用<code>spacing_****</code>尺寸格式来布局，而不是像对待String字符串一样直接写值。<br>这样写会非常有感觉，会使组织和改变风格或布局是非常容易。</p>
+<p><strong>避免深层次的视图结构</strong> 有时候为了摆放一个视图，你可能尝试添加另一个LinearLayout。你可能使用这种方法解决：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">LinearLayout</span></span><br><span class="line">	<span class="attribute">android:layout_width</span>=<span class="value">"match_parent"</span></span><br><span class="line">	<span class="attribute">android:layout_height</span>=<span class="value">"match_parent"</span></span><br><span class="line">	<span class="attribute">android:orientation</span>=<span class="value">"vertical"</span></span><br><span class="line">	&gt;</span></span><br><span class="line"></span><br><span class="line">	<span class="tag">&lt;<span class="title">RelativeLayout</span></span><br><span class="line">		<span class="attribute">...</span></span><br><span class="line">		&gt;</span></span><br><span class="line"></span><br><span class="line">		<span class="tag">&lt;<span class="title">LinearLayout</span></span><br><span class="line">			<span class="attribute">...</span></span><br><span class="line">			&gt;</span></span><br><span class="line"></span><br><span class="line">			<span class="tag">&lt;<span class="title">LinearLayout</span></span><br><span class="line">				<span class="attribute">...</span></span><br><span class="line">				&gt;</span></span><br><span class="line"></span><br><span class="line">				<span class="tag">&lt;<span class="title">LinearLayout</span></span><br><span class="line">					<span class="attribute">...</span></span><br><span class="line">					&gt;</span></span><br><span class="line">				<span class="tag">&lt;/<span class="title">LinearLayout</span>&gt;</span></span><br><span class="line"></span><br><span class="line">			<span class="tag">&lt;/<span class="title">LinearLayout</span>&gt;</span></span><br><span class="line"></span><br><span class="line">		<span class="tag">&lt;/<span class="title">LinearLayout</span>&gt;</span></span><br><span class="line"></span><br><span class="line">	<span class="tag">&lt;/<span class="title">RelativeLayout</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="title">LinearLayout</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>即使你没有非常明确的在一个layout布局文件中这样使用，如果你在Java文件中从一个view inflate（这个inflate翻译不过去，大家理解就行） 到其他views当中，也是可能会发生的。</p>
+<p>可能会导致一系列的问题。你可能会遇到性能问题，因为处理起需要处理一个复杂的UI树结构。<br>还可能会导致以下更严重的问题<a href="http://stackoverflow.com/questions/2762924/java-lang-stackoverflow-error-suspected-too-many-views" target="_blank" rel="external">StackOverflowError</a>.</p>
+<p>因此尽量保持你的视图tree：学习如何使用<a href="https://developer.android.com/guide/topics/ui/layout/relative.html" target="_blank" rel="external">RelativeLayout</a>,<br>如何 <a href="http://developer.android.com/training/improving-layouts/optimizing-layout.html" target="_blank" rel="external">optimize 你的布局</a> 和如何使用<br><a href="http://stackoverflow.com/questions/8834898/what-is-the-purpose-of-androids-merge-tag-in-xml-layouts" target="_blank" rel="external"><code>&lt;merge&gt;</code> 标签</a>.</p>
+<p><strong>小心关于WebViews的问题.</strong> 如果你必须显示一个web视图，<br>比如说对于一个新闻文章，避免做客户端处理HTML的工作，<br>最好让后端工程师协助，让他返回一个 “<em>纯</em>“ HTML。<br><a href="http://stackoverflow.com/questions/3130654/memory-leak-in-webview" target="_blank" rel="external">WebViews 也能导致内存泄露</a><br>当保持引他们的Activity，而不是被绑定到ApplicationContext中的时候。<br>当使用简单的文字或按钮时，避免使用WebView，这时使用TextView或Buttons更好。</p>
+<h3 id="测试框架">测试框架</h3><p>Android SDK的测试框架还处于初级阶段，特别是关于UI测试方面。Android Gradle<br>目前实现了一个叫<a href="http://tools.android.com/tech-docs/new-build-system/user-guide#TOC-Testing" target="_blank" rel="external"><code>connectedAndroidTest</code></a>的测试，<br>它<a href="http://developer.android.com/reference/android/test/package-summary.html" target="_blank" rel="external">使用一个JUnit 为Android提供的扩展插件 extension of JUnit with helpers for Android</a>.可以跑你生成的JUnit测试，</p>
+<p><strong>只当做单元测试时使用 <a href="http://robolectric.org/" target="_blank" rel="external">Robolectric</a> ，views 不用</strong><br>它是一个最求提供”不连接设备的”为了加速开发的测试，<br>非常时候做 models 和 view models 的单元测试。<br>然而，使用Robolectric测试时不精确的，也不完全对UI测试。<br>当你对有关动画的UI元素、对话框等，测试时会有问题，<br>这主要是因为你是在 “在黑暗中工作”（在没有可控的界面情况下测试）</p>
+<p><strong><a href="https://code.google.com/p/robotium/" target="_blank" rel="external">Robotium</a> 使写UI测试非常简单。
+</strong> 对于UI测试你不需 Robotium 跑与设备连接的测试。<br>但它可能会对你有益，是因为它有许多来帮助类的获得和分析视图，控制屏幕。<br>测试用例看起来像这样简单：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">solo.sendKey(Solo.MENU);</span><br><span class="line">solo.clickOnText(<span class="string">"More"</span>); <span class="comment">// searches for the first occurence of "More" and clicks on it</span></span><br><span class="line">solo.clickOnText(<span class="string">"Preferences"</span>);</span><br><span class="line">solo.clickOnText(<span class="string">"Edit File Extensions"</span>);</span><br><span class="line">Assert.assertTrue(solo.searchText(<span class="string">"rtf"</span>));</span><br></pre></td></tr></table></figure>
+<h3 id="模拟器">模拟器</h3><p>如果你全职开发Android App,那么买一个<a href="http://www.genymotion.com/" target="_blank" rel="external">Genymotion emulator</a>license吧。<br>Genymotion 模拟器运行更快的秒帧的速度，比起典型的AVD模拟器。他有演示你APP的工具，高质量的模拟网络连接，GPS位置，等等。它同时还有理想的连接测试。<br>你若涉及适配使用很多不同的设备，买一个Genymotion 版权是比你买很多真设备便宜多的。</p>
+<p>注意：Genymotion模拟器没有装载所有的Google服务，如Google Play Store和Maps。你也可能需<br>要测试Samsung指定的API，若这样的话你还是需要购买一个真实的Samsung设备。</p>
+<h3 id="混淆配置">混淆配置</h3><p><a href="http://proguard.sourceforge.net/" target="_blank" rel="external">ProGuard</a> 是一个在Android项目中广泛使用的压缩和混淆打包的源码的工具。</p>
+<p>你是否使用ProGuard取决你项目的配置，当你构建一个release版本的apk时，通常你应该配置gradle文件。</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">buildTypes &#123;</span><br><span class="line">	debug &#123;</span><br><span class="line">		minifyEnabled <span class="literal">false</span></span><br><span class="line">	&#125;</span><br><span class="line">	release &#123;</span><br><span class="line">		signingConfig signingConfigs.release</span><br><span class="line">		minifyEnabled <span class="literal">true</span></span><br><span class="line">		proguardFiles <span class="string">'proguard-rules.pro'</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>为了决定哪些代码应该被保留，哪些代码应该被混淆，你不得不指定一个或多个实体类在你的代码中。<br>这些实体应该是指定的类包含main方法，applets，midlets，activities，等等。<br>Android framework 使用一个默认的配置文件，可以在<code>SDK_HOME/tools/proguard/proguard-android.txt</code><br>目录下找到。自定义的工程指定的 project-specific 混淆规则，如在<code>my-project/app/proguard-rules.pro</code>中定义，<br>会被添加到默认的配置中。</p>
+<p>关于 ProGuard 一个普遍的问题，是看应用程序是否崩溃并报<code>ClassNotFoundException</code> 或者 <code>NoSuchFieldException</code> 或类似的异常，<br>即使编译是没有警告并运行成功。<br>这意味着以下两种可能：</p>
+<ol>
+<li>ProGuard 已经移除了类，枚举，方法，成员变量或注解，考虑是否是必要的。</li>
+<li>ProGuard 混淆了类，枚举，成员变量的名称，但是这些名字又被拿原始名称使用了，比如通过Java的反射。</li>
+</ol>
+<p>检查<code>app/build/outputs/proguard/release/usage.txt</code>文件看有问题的对象是否被移除了。<br>检查 <code>app/build/outputs/proguard/release/mapping.txt</code> 文件看有问题的对象是否被混淆了。</p>
+<p>In order to prevent ProGuard from <em>stripping away</em> needed classes or class members, add a <code>keep</code> options to your proguard config:<br>以防 ProGuard <em>剥离</em> 需要的类和类成员，添加一个 <code>keep</code>选项在你的 proguard 配置文件中：<br><figure class="highlight haml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-<span class="ruby">keep <span class="class"><span class="keyword">class</span> <span class="title">com</span>.<span class="title">futurice</span>.<span class="title">project</span>.<span class="title">MyClass</span> &#123; *;</span> &#125;</span></span><br></pre></td></tr></table></figure></p>
+<p>防止 ProGuard <em>混淆</em> 一些类和成员，添加 <code>keepnames</code>:<br><figure class="highlight haml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-<span class="ruby">keepnames <span class="class"><span class="keyword">class</span> <span class="title">com</span>.<span class="title">futurice</span>.<span class="title">project</span>.<span class="title">MyClass</span> &#123; *;</span> &#125;</span></span><br></pre></td></tr></table></figure></p>
+<p>查看<a href="https://github.com/futurice/android-best-practices/blob/master/templates/rx-architecture/app/proguard-rules.pro" target="_blank" rel="external">this template’s ProGuard config</a> 中的一些例子。<br>更多例子请参考<a href="http://proguard.sourceforge.net/#manual/examples.html" target="_blank" rel="external">Proguard</a>。</p>
+<p><strong>在构建项目之初，发布一个版本</strong> 来检查ProGuard规则是否正确的保持了重要的部分。<br>同时无论何时你添加了新的类库，做一个发布版本，同时apk在设备上跑起来测试一下。<br>不要等到你的app要发布 “1.0”版本了才做版本发布，那时候你可能会碰到好多意想不到的异常，需要一些时间去修复他们。</p>
+<p><strong>Tips</strong>每次发布新版本都要写 <code>mapping.txt</code>。每发布一个版本，如果用户遇到一个bug，同时提交了一个混淆过的堆栈跟踪。<br>通过保留<code>mapping.txt</code>文件，来确定你可以调试的问题。</p>
+<p><strong>DexGuard</strong> 若果你需要核心工具来优化，和专门混淆的发布代码，考虑使用<a href="http://www.saikoa.com/dexguard" target="_blank" rel="external">DexGuard</a>,<br>一个商业软件，ProGuard 也是有他们团队开发的。<br>它会很容易将Dex文件分割，来解决65K个方法限制问题。</p>
+<h3 id="致谢">致谢</h3><p>感谢Antti Lammi, Joni Karppinen, Peter Tackage, Timo Tuominen, Vera Izrailit, Vihtori Mäntylä, Mark Voit, Andre Medeiros, Paul Houghton 这些人和Futurice 开发者分享他们的Android开发经验。</p>
+<h3 id="License">License</h3><p><a href="www.futurice.com">Futurice Oy</a><br>Creative Commons Attribution 4.0 International (CC BY 4.0)</p>
+<h3 id="Translation">Translation</h3><p>Translated to Chinese by <a href="https://github.com/andyiac" target="_blank" rel="external">andyiac</a></p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<blockquote>
+<p><strong>原文转载自 <a href="https://github.com/futurice/android-best-practices">android-best-practices</a> 项目，中文由 <a href="https://github.com/andyiac">@andyiac</a> 翻译</strong><br><strong>原文地址</strong><br><strong><a href="https://github.com/futurice/android-best-practices/blob/master/translations/Chinese/README.cn.md">https://github.com/futurice/android-best-practices/blob/master/translations/Chinese/README.cn.md</a></strong></p>
+</blockquote>
+<h1 id="Android_开发最佳实践">Android 开发最佳实践</h1><p>从<a href="http://www.futurice.com">Futurice</a>公司Android开发者中学到的经验。<br>遵循以下准则，避免重复发明轮子。若您对开发iOS或Windows Phone 有兴趣，<br>请看<a href="https://github.com/futurice/ios-good-practices"><strong>iOS Good Practices</strong></a> 和 <a href="https://github.com/futurice/win-client-dev-good-practices"><strong>Windows client Good Practices</strong></a> 这两篇文章。<br>]]>
+    
+    </summary>
+    
+      <category term="Android" scheme="http://licheedev.com/tags/Android/"/>
+    
+      <category term="Android" scheme="http://licheedev.com/categories/Android/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[解决Android Studio添加依赖时出现“Manifest merger failed”]]></title>
+    <link href="http://licheedev.com/2015/05/20/manifest-merger-failed/"/>
+    <id>http://licheedev.com/2015/05/20/manifest-merger-failed/</id>
+    <published>2015-05-20T14:29:31.000Z</published>
+    <updated>2015-05-20T16:13:49.603Z</updated>
+    <content type="html"><![CDATA[<p>今天一技术群里的朋友碰到个问题，说用Android Studio导入第三方依赖库时报错，出现这个：</p>
+<p><img src="http://i1.tietuku.com/0373d83ce0e7c039.png" alt="报错1"></p>
+<p>所导入的依赖为这个</p>
+<blockquote>
+<p>SweetAlertDialog:<br><a href="https://github.com/pedant/sweet-alert-dialog" target="_blank" rel="external">https://github.com/pedant/sweet-alert-dialog</a><br><a id="more"></a></p>
+</blockquote>
+<p>于是多管闲事的我试着导入了下，也出错了，不过没出现上面截图的错误，而出现<code>Manifest merger failed（Manifest合并失败）</code>错误，如下图：</p>
+<p><img src="http://i1.tietuku.com/c29e5a530cb585a5.jpg" alt="报错2"></p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">Error:</span>(<span class="number">7</span>, <span class="number">9</span>) Attribute application<span class="annotation">@icon</span> value=(<span class="annotation">@mipmap</span>/ic_launcher) from AndroidManifest.<span class="string">xml:</span><span class="number">7</span>:<span class="number">9</span></span><br><span class="line"><span class="string">Error:</span>(<span class="number">7</span>, <span class="number">9</span>) Execution failed <span class="keyword">for</span> task <span class="string">':importdemo:processDebugManifest'</span>.</span><br><span class="line">&gt; Manifest merger <span class="string">failed :</span> Attribute application<span class="annotation">@icon</span> value=(<span class="annotation">@mipmap</span>/ic_launcher) from AndroidManifest.<span class="string">xml:</span><span class="number">7</span>:<span class="number">9</span></span><br><span class="line">	is also present at com.<span class="string">pnikosis:</span>materialish-<span class="string">progress:</span><span class="number">1.0</span>:<span class="number">13</span>:<span class="number">9</span> value=(<span class="annotation">@drawable</span>/ic_launcher)</span><br><span class="line"><span class="label">	Suggestion:</span> add <span class="string">'tools:replace="android:icon"'</span> to &lt;application&gt; element at AndroidManifest.<span class="string">xml:</span><span class="number">5</span>:<span class="number">5</span> to override</span><br></pre></td></tr></table></figure>
+<p><img src="http://i1.tietuku.com/a63c74bf309c7dc0.jpg" alt="分析错误"></p>
+<p>分析错误提示，</p>
+<ol>
+<li>主程序module清单文件中,<code>application</code>节点的<code>android:icon</code>属性引用了<code>@mipmap/ic_launcher</code>图片资源，</li>
+<li>而依赖module的清单文件中，同样的<code>android:icon</code>属性却引用了<code>@drawable/ic_launcher</code>这个图片资源，</li>
+</ol>
+<p>两个属性值产生冲突，导致合并清单文件失败。</p>
+<p>虽然知道错误是什么，但是仍然不知道咋解决啊。<br>其实英语没那么糟糕，细心点的话，就能看到错误提示中就给出了解决问题的建议。</p>
+<blockquote>
+<p>Suggestion: add ‘tools:replace=”android:icon”‘ to <application> element at AndroidManifest.xml:5:5 to override</application></p>
+</blockquote>
+<p>意思在<code>AndroidManifest.xml</code>文件的<code>&lt;application&gt;</code>节点中添加<code>tools:replace=&quot;android:icon&quot;</code>属性。</p>
+<p><img src="http://i1.tietuku.com/05b569af37ecfecd.jpg" alt="修改"></p>
+<p>按提示进行修改，再同步Gradle，问题解决。</p>
+<blockquote>
+<p><code>tools:replace</code> 属性的作用可以在这个页面找到（需要搭梯）<br><a href="http://tools.android.com/tech-docs/new-build-system/user-guide/manifest-merger" target="_blank" rel="external">http://tools.android.com/tech-docs/new-build-system/user-guide/manifest-merger</a><br>在页面搜索 <code>Override an attribute coming from a library</code> 即可定位到。</p>
+</blockquote>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>今天一技术群里的朋友碰到个问题，说用Android Studio导入第三方依赖库时报错，出现这个：</p>
+<p><img src="http://i1.tietuku.com/0373d83ce0e7c039.png" alt="报错1"></p>
+<p>所导入的依赖为这个</p>
+<blockquote>
+<p>SweetAlertDialog:<br><a href="https://github.com/pedant/sweet-alert-dialog">https://github.com/pedant/sweet-alert-dialog</a><br>]]>
+    
+    </summary>
+    
+      <category term="Gradle" scheme="http://licheedev.com/tags/Gradle/"/>
+    
+      <category term="Android" scheme="http://licheedev.com/categories/Android/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[ImageView的scaleType设置不当，导致使用Glide时出现OOM]]></title>
+    <link href="http://licheedev.com/2015/05/16/imageview-scale-type/"/>
+    <id>http://licheedev.com/2015/05/16/imageview-scale-type/</id>
+    <published>2015-05-16T13:07:01.000Z</published>
+    <updated>2015-06-12T15:55:15.418Z</updated>
+    <content type="html"><![CDATA[<p>之前看到一篇介绍图片加载库——Glide的文章。</p>
+<blockquote>
+<p><a href="http://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2015/0327/2650.html" target="_blank" rel="external">http://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2015/0327/2650.html</a></p>
+</blockquote>
+<p>看到连Google官方也在用。自动缓存，自动图片压缩，支持加载网络图片、加载Gif等等，支持集成Volley和okHttp，总之好处多多。</p>
+<p>于是找到 <a href="https://github.com/bumptech/glide" target="_blank" rel="external"><strong>Glide</strong></a> 在Github上面的项目主页，按照说明写了个简单的Demo。<br><a id="more"></a></p>
+<p><img src="http://i1.tietuku.com/30b2314c914de3cc.png" alt="glide"></p>
+<p>简单描述一下Demo吧，就是在tomcat上面弄一个webapp，里面就放了70来张非常大的jpg图片（某个<a href="http://sukebei.nyaa.se/?page=view&amp;tid=1023869" target="_blank" rel="external">エロゲーム</a> 的CG，因为内容比较和谐，我就不细说了，总之每张图都有<code>2560*1400</code>分辨率，<a href="http://i1.tietuku.com/4bfa5ae0477c644d.jpg" target="_blank" rel="external">sample</a>，刚好用来测试性能），还有包含着这些图片地址的json文件。</p>
+<p>然后就是写个ListView，加载这些图片了。什么convertView复用，ViewHolder也弄好了。</p>
+<p>运行，图片顺利加载，慢慢拖动，貌似也没问题，但是一快速滑动（也就是fling），就变得非常卡，Logcat出现 OutOfMemoryError。</p>
+<p><img src="http://i1.tietuku.com/95e9dde35552495e.jpg" alt="OOM"></p>
+<p>检查了下程序逻辑，没啥问题，Glide的介绍提到了会按照ImageView大小了缩放和缓存图像，不至于这样啊。</p>
+<p>百思不得其解，就去Glide项目页那里，用蹩脚的英文发了个issue，然后<a href="https://github.com/TWiStErRob" target="_blank" rel="external">@TWiStErRob</a>大神也很用心地回答了。</p>
+<blockquote>
+<p><a href="https://github.com/bumptech/glide/issues/464" target="_blank" rel="external">https://github.com/bumptech/glide/issues/464</a><br><br>Glad it helped. Feel free to ask further questions if you’re stuck.<br><br>For posterity: fitXY forces Glide to read at full resolution and then let the ImageView handle the distortion (fitXY doesn’t keep aspect ratio). If you want to keep distorting the images, you can keep fitXY on the imageView and call centerCrop() or fitCenter() before load(): this will make Glide downsample the image (less memory) before handing it to ImageView for distortion.<br><br>Here’s a further tip I just noticed: you could also change android:src to tools:src. That way you will save some layout passes (ImageView does a layout on every setImage*() call) and you can skip loading a bitmap (launcher icon when inflating each item) unnecessarily (you’ll overwrite it anyway with Glide). The tools attributes are not compiled into the apk, so it’s optimal to use them in these situations.</p>
+</blockquote>
+<p>原来是ImageView的<code>scaleType</code>的问题，当设置为<code>fitXY</code>时，虽然ImageView显示那么点尺寸，但是，但是Glide加载图片时，却是以全分辨率加载的，于是加载几张，就OOM了。<br>改成<code>fitCenter</code>或者<code>centerCrop</code>(试了一下<code>fitStart</code>、<code>fitEnd</code>也行，总之看需求了)，就好了，会自动缓存小图，滚动起来也非常流畅。</p>
+<p>完全没想到原来坑在<code>scaleType</code>上面，这下记住了。</p>
+<p>最后感谢<a href="https://github.com/TWiStErRob" target="_blank" rel="external">@TWiStErRob</a>大神的耐心回答，Github已follow。</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>之前看到一篇介绍图片加载库——Glide的文章。</p>
+<blockquote>
+<p><a href="http://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2015/0327/2650.html">http://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2015/0327/2650.html</a></p>
+</blockquote>
+<p>看到连Google官方也在用。自动缓存，自动图片压缩，支持加载网络图片、加载Gif等等，支持集成Volley和okHttp，总之好处多多。</p>
+<p>于是找到 <a href="https://github.com/bumptech/glide"><strong>Glide</strong></a> 在Github上面的项目主页，按照说明写了个简单的Demo。<br>]]>
+    
+    </summary>
+    
+      <category term="Glide" scheme="http://licheedev.com/tags/Glide/"/>
+    
+      <category term="ImageView" scheme="http://licheedev.com/tags/ImageView/"/>
+    
+      <category term="scaleType" scheme="http://licheedev.com/tags/scaleType/"/>
+    
+      <category term="Android" scheme="http://licheedev.com/categories/Android/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[坑爹显示器分辨率太低，任务栏遮住Android Studio的按钮了]]></title>
+    <link href="http://licheedev.com/2015/05/05/hide-taskbar/"/>
+    <id>http://licheedev.com/2015/05/05/hide-taskbar/</id>
+    <published>2015-05-05T15:22:43.000Z</published>
+    <updated>2015-05-05T16:06:52.280Z</updated>
+    <content type="html"><![CDATA[<p>今晚继续玩Android Studio, 想用AS的向导建一个Activity，这样，</p>
+<p><img src="http://i2.tietuku.com/33d13545e136d9ab.jpg" alt="Capture1"></p>
+<a id="more"></a>
+<p>然后这样，</p>
+<p><img src="http://i2.tietuku.com/49a50afcfaab2d4a.jpg" alt="Capture1"></p>
+<p>然后我就囧了。为毛？这破笔记本的显示器分辨率（1366*768）太低，任务栏把按钮挡住了，鼠标根本够不着啊。</p>
+<p><img src="http://i2.tietuku.com/12fabde738395a79.jpg" alt="Capture2"></p>
+<p>好吧，改变一下窗口大小就好了，我可是记得AS建工程的时候可以改变窗口大小的，这个应该也行吧，<br>于是把鼠标挪到窗口边边推了推，又囧了，</p>
+<p><img src="http://i2.tietuku.com/68bcc573b493ec26.gif" alt="Capture3"></p>
+<p>尼玛，这脚本不对啊，根本推不动啊，还有这闪来闪去的是什么鬼，</p>
+<p>没法，唯有隐藏任务栏了，虽然知道任务栏可以设定自动隐藏，不过印象中那玩意经常失灵，还是算了，而且我也不喜欢那样老动来动去。</p>
+<p>好吧，只好找个能快捷键隐藏任务栏的小工具了，随便搜了下，还真找到个叫<code>TaskBarHider</code>的小工具。</p>
+<blockquote>
+<p>作者：<a href="http://zyhh.me/" target="_blank" rel="external">@醉倚黄昏</a>,下载地址 <a href="http://zyhh.me/delphi/taskbarhider.html" target="_blank" rel="external">http://zyhh.me/delphi/taskbarhider.html</a></p>
+</blockquote>
+<p><img src="http://i1.tietuku.com/e04d9c1b79ba9323.jpg" alt="Capture4"></p>
+<p>试用了下，还挺不错，支持<code>ctrl + ~（数字1左边那个）</code>快捷键隐藏/恢复任务栏。</p>
+<p>这下子终于能按到那按钮了，虽然依然只能显示半边，总比点不着要好。</p>
+<p><img src="http://i2.tietuku.com/b5a912921ff032ef.jpg" alt="Capture5"></p>
+<p>最后不得不吐槽一句，1366*768是最坑爹的分辨率，没有之一，哪怕1280*800多比这个好多了。算了，我还是赶紧搬砖，等什么时候发达了买个mac吧。</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>今晚继续玩Android Studio, 想用AS的向导建一个Activity，这样，</p>
+<p><img src="http://i2.tietuku.com/33d13545e136d9ab.jpg" alt="Capture1"></p>]]>
+    
+    </summary>
+    
+      <category term="Android Studio" scheme="http://licheedev.com/tags/Android-Studio/"/>
+    
+      <category term="Android" scheme="http://licheedev.com/categories/Android/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[Android Studio-1.2版本设置教程(部分内容过时，1.3版后再更新)]]></title>
+    <link href="http://licheedev.com/2015/05/02/android-studio-settings/"/>
+    <id>http://licheedev.com/2015/05/02/android-studio-settings/</id>
+    <published>2015-05-02T09:01:40.000Z</published>
+    <updated>2015-06-13T16:14:44.285Z</updated>
+    <content type="html"><![CDATA[<blockquote>
+<p><strong>转载请注明原文出处 <a href="http://www.licheedev.com/2015/05/02/android-studio-settings/" target="_blank" rel="external">http://www.licheedev.com/2015/05/02/android-studio-settings/</a> </strong></p>
+</blockquote>
+<p>这两天Google更新了Android Studio 1.2正式版，新版本的设置界面大变面，设置条目较旧版本进行了归类，不像以前那样列表长长的了。</p>
+<p>趁着安装新版本的机会，把常用的设置记录一下，放到博客里面，以作备忘。</p>
+<a id="more"></a>
+<h1 id="Android_Studio_/_Gradle学习资源">Android Studio / Gradle学习资源</h1><p>在说设置之前，先上点学习Android Studio和Gradle的学习资源。</p>
+<h2 id="官方教程">官方教程</h2><ul>
+<li>developer.android.com上的<strong>Android Studio Overview</strong><br><a href="http://developer.android.com/tools/studio/index.html" target="_blank" rel="external">http://developer.android.com/tools/studio/index.html</a></li>
+<li>developer.android.com上的<strong>Build System Overview</strong><br><a href="http://developer.android.com/sdk/installing/studio-build.html" target="_blank" rel="external">http://developer.android.com/sdk/installing/studio-build.html</a></li>
+<li>tools.android.com上的<strong>Gradle Plugin User Guide*</strong>（Google出的Gradle指南）<br><a href="http://tools.android.com/tech-docs/new-build-system/user-guide" target="_blank" rel="external">http://tools.android.com/tech-docs/new-build-system/user-guide</a></li>
+<li>IntelliJ IDEA <strong>Quick Start</strong>（IDEA入门教程）<br><a href="https://www.jetbrains.com/idea/help/intellij-idea-quick-start-guide.html" target="_blank" rel="external">https://www.jetbrains.com/idea/help/intellij-idea-quick-start-guide.html</a></li>
+<li>IntelliJ IDEA的快捷键大全<br><a href="https://www.jetbrains.com/idea/docs/IntelliJIDEA_ReferenceCard_Mac.pdf" target="_blank" rel="external">https://www.jetbrains.com/idea/docs/IntelliJIDEA_ReferenceCard_Mac.pdf</a></li>
+</ul>
+<h2 id="非官方资源">非官方资源</h2><ul>
+<li><strong>Developer Phil博客</strong>的<strong>Android Studio Tips系列</strong>（里面提供快捷键效果的动态图，<strong>强烈推荐</strong>）<br><a href="http://www.developerphil.com/android-studio-tips-tricks-moving-around/#recent-posts-4" target="_blank" rel="external">http://www.developerphil.com/android-studio-tips-tricks-moving-around/#recent-posts-4</a></li>
+<li>Android-Studio-Tips-by-Philippe-Breault（貌似就是上面那个，还没细看，暂时不确定是不是一样，还是发出来好了）<br><a href="https://github.com/pavlospt/Android-Studio-Tips-by-Philippe-Breault/wiki" target="_blank" rel="external">https://github.com/pavlospt/Android-Studio-Tips-by-Philippe-Breault/wiki</a></li>
+<li><strong>stormzhang</strong>大神的<strong>Android Studio系列教程</strong>（推荐）<br><a href="http://stormzhang.com/posts.html#AndroidStudio" target="_blank" rel="external">http://stormzhang.com/posts.html#AndroidStudio</a></li>
+<li><strong>Rinvay Tang</strong>的博客<br>（《Gradle Plugin User Guide》翻译版，《使用Gradle构建Android程序》）（推荐）<br><a href="http://rinvay.github.io/archive.html" target="_blank" rel="external">http://rinvay.github.io/archive.html</a></li>
+<li><strong>Gradle Android插件用户指南翻译</strong>（《Gradle Plugin User Guide》另一个翻译版）<br><a href="http://avatarqing.github.io/Gradle-Plugin-User-Guide-Chinese-Verision/" target="_blank" rel="external">http://avatarqing.github.io/Gradle-Plugin-User-Guide-Chinese-Verision/</a></li>
+<li>Github上面搜“Android Studio”（很多好东西都在里面）<br><a href="https://github.com/search?utf8=%E2%9C%93&amp;q=Android+Studio" target="_blank" rel="external">https://github.com/search?utf8=%E2%9C%93&amp;q=Android+Studio</a></li>
+</ul>
+<h1 id="环境搭建相关">环境搭建相关</h1><h2 id="下载">下载</h2><p>正式版的Android Studio和SDK可以在下面的链接进行下载<br><a href="http://developer.android.com/sdk/index.html#Other" target="_blank" rel="external">http://developer.android.com/sdk/index.html#Other</a><br>关于下载，我建议下载绿色版的Android Studio和SDK，别下安装包版捆绑版的，这样如果有哪个出了问题要重装，只要动一个就行了。</p>
+<p><img src="http://i4.tietuku.com/d1cdaa3469459a3f.jpg" alt="下载"><br>其他版本可以在这里找到 <a href="http://tools.android.com/download/studio/canary" target="_blank" rel="external">http://tools.android.com/download/studio/canary</a> </p>
+<h2 id="禁用Windows中Ctrl+Space切换输入法的快捷键">禁用Windows中<code>Ctrl+Space</code>切换输入法的快捷键</h2><p>Windows的Ctrl+Space快捷键（切换中文输入法）跟一堆IDE的冲突，所以必须禁用掉，按照下图那样修改注册表即可。<br>或者下载我改好的注册表文件（<a href="https://github.com/licheedev/filestore/raw/master/others/disable_ctrl_space.zip" target="_blank" rel="external">右键另存为</a>），双击导入压缩包里面的文件，重启系统即可。</p>
+<p><img src="http://i4.tietuku.com/4824ab2a935b548c.jpg" alt="禁用Windows+Space快捷键"><br>原理参考<a href="http://answers.microsoft.com/en-us/windows/forum/windows_vista-desktop/how-do-i-disable-the-changing-of-languages-when-i/f01de525-73b2-4c4e-969e-b5aa001c0eb7" target="_blank" rel="external">这里</a>。</p>
+<h2 id="环境变量">环境变量</h2><p>很多IDE依赖环境变量，正确设置好环境变量，可以确保软件能正常运行，和避免很多莫名奇妙的问题。</p>
+<p>设置环境变量的方法请自行搜索。下面的环境变量值都是我自己电脑的，请按照<code>实际情况</code>进行修改。<br>还有<code>PATH</code>的要特别注意，要加到原来的后面，别一脑门全部覆盖掉。</p>
+<h3 id="JAVA">JAVA</h3><figure class="highlight mel"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">JAVA_HOME=E:\DevTools\Others\Java\jdk1.7.0_67</span><br><span class="line">CLASSPATH=.;<span class="variable">%JAVA_HOME</span><span class="variable">%\</span>lib;<span class="variable">%JAVA_HOME</span><span class="variable">%\</span>lib\tools.jar</span><br><span class="line"># 注意，<span class="variable">%PATH</span><span class="variable">%为</span>原来的环境变量值，添加<span class="string">";"</span>和后面的内容到原来值的后面</span><br><span class="line">PATH=<span class="variable">%PATH</span><span class="variable">%;</span><span class="variable">%JAVA_HOME</span><span class="variable">%\</span>bin;<span class="variable">%JAVA_HOME</span><span class="variable">%\</span>jre\bin</span><br></pre></td></tr></table></figure>
+<h3 id="Android_SDK">Android SDK</h3><figure class="highlight mel"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ANDROID_HOME=E:\DevTools\Android\sdk</span><br><span class="line">PATH=<span class="variable">%PATH</span><span class="variable">%;</span><span class="variable">%ANDROID_HOME</span><span class="variable">%\</span>tools;<span class="variable">%ANDROID_HOME</span><span class="variable">%\</span>platform-tools</span><br><span class="line"># ADB端口，可以避免国内一堆软件，如酷狗音乐啥的把ADB端口抢占了，值随便改个不常用的就行</span><br><span class="line">ANDROID_ADB_SERVER_PORT=<span class="number">7123</span></span><br></pre></td></tr></table></figure>
+<h3 id="Gradle">Gradle</h3><figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="special">#</span> Android Studio正式版后就内置了一个Gradle，当然你也可以另外去Gradle官网下载一个</span><br><span class="line">GRADLE_HOME=E:<span class="command">\DevTools</span><span class="command">\Android</span><span class="command">\android</span>-studio<span class="command">\gradle</span><span class="command">\gradle</span>-2.2.1<span class="command">\bin</span></span><br><span class="line">PATH=<span class="comment">%PATH%;%GRADLE_HOME%\bin</span></span><br><span class="line"><span class="special">#</span> 依赖仓库存放路径，平时构建工程时下载的依赖库都放在这里</span><br><span class="line"><span class="special">#</span> 不配置的话，Windows中默认是在C:<span class="command">\Users</span><span class="command">\&lt;</span>username&gt;<span class="command">\.</span>gradle的</span><br><span class="line"><span class="special">#</span> 重装系统时忘记备份，又不想重新下载依赖的话，就赶紧把这里改了</span><br><span class="line">GRADLE_USER_HOME=E:<span class="command">\DevWorks</span><span class="command">\.</span>gradle</span><br></pre></td></tr></table></figure>
+<h2 id="运行Android_Studio前的配置">运行Android Studio前的配置</h2><h3 id="配置SDK_Manager科学上网，升级SDK">配置SDK Manager科学上网，升级SDK</h3><p>最近红杏出了公益代理，简直是开发人员的福音，详情看：<a href="http://blog.honx.in/dev-only/" target="_blank" rel="external">http://blog.honx.in/dev-only/</a><br>按照红杏提供地址和端口（目前是<code>hx.gy:1080</code>）进行修改（别加<code>http://</code>），必要时可以按一下“Clear Cache”。</p>
+<p>有条件的话，可以试试买个付费的shadowsocks，我现在shadowsocks.com的99包年套餐。<br>电信8M，部分线路能达到900多KB/s的速度，几乎满速了，感觉还行。<br>具体怎么购买和配置，不在本文介绍范围内，请自行找科普。<br>如果要买的话，请务必用 <a href="https://portal.shadowsocks.com/aff.php?aff=470" target="_blank" rel="external"><code>我的推广链接</code></a> ，我有提成的。（笑）</p>
+<p><img src="http://i1.tietuku.com/655456e2121590d9.jpg" alt="SDK Manager配置"></p>
+<p>关于下载，<code>Tools</code>中<code>Android SDK Build-tools</code>建议<code>全部下载</code>，<br>其他各个API版本，建议至少下载<code>SDK Platform</code>（必须，framework层的东东全在这里）和<code>Sources for Android SDK</code>（源码），<br><code>Extras</code>中<strong><em>必须</em></strong>下载<code>Android Support Repository</code>和<code>Android Support Library</code>（Support库的东东，现在开发离不开Support库了），<br>上面提到的是开发必须用到的，其他东西就看情况了，你有时间又不在乎资源占用的话，全下载都行。<br>顺便附上我自己下载的，<a href="http://i1.tietuku.com/53c9ca6eee9d8ab6.jpg" target="_blank" rel="external">猛戳此连接查看</a>。</p>
+<p><a id="idea-properties"></a></p>
+<h3 id="修改idea-properties文件">修改idea.properties文件</h3><p>找到<code>&lt;android-studio&gt;\bin\idea.properties</code>文件，打开，改成这样：</p>
+<p><img src="http://i4.tietuku.com/6e2599351ee2b032.jpg" alt="idea.properties"></p>
+<figure class="highlight puppet"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 禁止第一次运行Android Studio时，自动检查和升级Android SDK</span></span><br><span class="line">disable.android.first.run=<span class="keyword">true</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 下面两个是Android Studio的设置、插件和运行时产生的其他文件存放的目录</span></span><br><span class="line"><span class="comment"># 不改的话，Windows中默认在 C:\Users\&lt;username&gt;\.AndroidStudio.2\ 里面</span></span><br><span class="line"><span class="comment"># $&#123;idea.home.path&#125;表示Android Studio程序的主目录，注意目录分隔符要用正斜杠“/”</span></span><br><span class="line">idea.config.<span class="built_in">path</span>=$<span class="keyword">&#123;</span>idea.<span class="literal">home</span>.<span class="built_in">path</span><span class="keyword">&#125;</span>/.<span class="constant">Android</span>Studio.<span class="number">2</span>/config</span><br><span class="line">idea.<span class="literal">system</span>.<span class="built_in">path</span>=$<span class="keyword">&#123;</span>idea.<span class="literal">home</span>.<span class="built_in">path</span><span class="keyword">&#125;</span>/.<span class="constant">Android</span>Studio.<span class="number">2</span>/<span class="literal">system</span></span><br></pre></td></tr></table></figure>
+<p>非常坑爹的是，每次Android Studio升级时，都会强制检测AS主目录里面的文件或文件夹是否被动过，<br>当然也包含这个idea.properties，<br>有些增强模板或插件，例如这个 <a href="https://github.com/gabrielemariotti/AndroidStudioTemplate" target="_blank" rel="external">AndroidStudioTemplate</a>，安装时要求覆盖<code>&lt;android-studio&gt;\plugins\android\lib\templates</code>。<br>如果发现被改了，就会要求进行<del>处理</del>（恢复默认）操作，举例来说，idea.properties和那个templates会被还原为解压时的模样，各种修改都会失效。<br>所以保险起见，这个<code>idea.properties</code>文件改完就备份一下，以后升级完AS，就手动改回去，各种插件/模板也存一个备份，别装完就删掉，免得被AS的升级程序删了后找不回来。</p>
+<h1 id="设置Android_Studio">设置Android Studio</h1><p>正题来了，运行后，进入欢迎界面，别急着建工程，先<code>Configure</code>→<code>Settings</code>去修改设置。</p>
+<h2 id="IDE外观&amp;行为">IDE外观&amp;行为</h2><h3 id="修改主题，修改全局字体">修改主题，修改全局字体</h3><p><img src="http://i4.tietuku.com/a7467ac2bd7067bf.jpg" alt="主题&amp;字体"></p>
+<ol>
+<li>修改主题，想用炫酷的深色主题，就改成<code>Darcula</code>吧；<br>字体的话，选一个带中文的，要不然会有很多<code>口口</code>，我这里用<code>Microsoft YaHei UI</code>，很不错。</li>
+<li>启用/禁用动画特效，禁用掉感觉可能会快点。</li>
+</ol>
+<h3 id="禁止自动打开上次的工程">禁止自动打开上次的工程</h3><p>我喜欢自己选打开哪个工程，果断禁用</p>
+<p><img src="http://i4.tietuku.com/ea4fb529175d61fc.jpg" alt="禁止自动打开最后打开的工程"></p>
+<h3 id="设置网络代理">设置网络代理</h3><p>跟上文一样，改为红杏公益代理吧</p>
+<p><img src="http://i4.tietuku.com/699907660e9f6148.jpg" alt="代理"></p>
+<h3 id="禁用自动检查更新">禁用自动检查更新</h3><p>洁癖的选择，升级控请无视</p>
+<p><img src="http://i4.tietuku.com/44821b256312b44c.jpg" alt="禁用更新"></p>
+<h3 id="配置快捷键">配置快捷键</h3><p>不管你改不改，反正我没改，默认的好，免得以后查资料，操作对不上</p>
+<p><img src="http://i4.tietuku.com/a1e17305d06190a3.jpg" alt="快捷键"></p>
+<h2 id="编辑器">编辑器</h2><h3 id="鼠标悬停显示文档，格式化&amp;导包提示">鼠标悬停显示文档，格式化&amp;导包提示</h3><p><img src="http://i4.tietuku.com/9fd64f9122214d96.jpg" alt="鼠标悬停显示文档，格式化&amp;导包提示"></p>
+<ol>
+<li>鼠标指针悬停若干时间，显示文档，时间自己改。</li>
+<li>就是按格式化代码或者导包时，是否会显示个对话框，觉得烦人的话，都取消掉吧，反正我取消了。</li>
+</ol>
+<h3 id="显示行号，显示方法分隔线">显示行号，显示方法分隔线</h3><p>勾上吧，你值得拥有的</p>
+<p><img src="http://i4.tietuku.com/7022f5b4a39a5dbe.jpg" alt="显示行号，显示方法分隔线"></p>
+<h3 id="代码折叠">代码折叠</h3><p>Intellij IDEA有很多地方的代码都能自动折叠，不过我看不惯，所以取消了，这里见仁见智，看着办<br>P.S. <code>Ctrl + .</code> 可以折叠和展开代码</p>
+<p><img src="http://i4.tietuku.com/e156cf6e6bb500d3.jpg" alt="代码折叠"></p>
+<h3 id="代码智能提示">代码智能提示</h3><p><img src="http://i4.tietuku.com/afcfe37b9d6ebba5.jpg" alt="代码智能提示"></p>
+<ol>
+<li>敲什么字符会提示，All(大小写全部符合)，None（不管大小写，符合就提示），（First letter）（第一个字符符合就OK，其他随意）。我这种脑残没记性的当然选择None。</li>
+<li>自动弹出文档，时间看着办。</li>
+<li>自动弹出方法参数提示，时间看着办。</li>
+</ol>
+<h3 id="自动导包">自动导包</h3><p><img src="http://i4.tietuku.com/a1bb4e23dde8936a.jpg" alt="自动导包"></p>
+<ul>
+<li>Optimize imports on the fly：优化导包，格式化代码时会删掉多余的导包。</li>
+<li>Add unambiguous imports on the fly：敲代码时，敲简单类名就帮你把包导了。</li>
+</ul>
+<h3 id="创建个人代码样式配置">创建个人代码样式配置</h3><p>估计是为了保护默认的代码样式配置，让用户把配置搞坏了也能一键还原，IDEA不允许修改默认的配置，需要用户创建配置才能进行修改。<br>选择基于哪个主题的，然后<code>Save As</code>一份即可。</p>
+<p><img src="http://i4.tietuku.com/2b866c9c4021e70a.jpg" alt="创建个人代码样式配置"></p>
+<h3 id="修改代码字体">修改代码字体</h3><p>强烈建议用<code>Consolas</code>字体，好看！！！</p>
+<p><img src="http://i4.tietuku.com/7e949854b0c76c50.jpg" alt="修改代码字体"></p>
+<h3 id="修改控制台字体">修改控制台字体</h3><p>好吧，我就喜欢这个字体不行么？</p>
+<p><img src="http://i4.tietuku.com/4188c779b2651289.jpg" alt="修改控制台字体"></p>
+<h3 id="Logcat字体">Logcat字体</h3><p>要改的话，得先把1那个地方的勾取消掉</p>
+<p><img src="http://i4.tietuku.com/a1d8f83d58306671.jpg" alt="Logcat字体"></p>
+<h3 id="修改注释位置，禁用“语句堆一行”">修改注释位置，禁用“语句堆一行”</h3><p><img src="http://i4.tietuku.com/bfdcc07101de949c.jpg" alt="修改注释位置，禁用“语句堆一行”"></p>
+<ul>
+<li>Comment at frist column：启用的话，注释符号就会在行首，否则就按照缩进来注释。我取消掉了。</li>
+<li>Control statement in one line：格式化代码的时候，会把些很短的语句合并成一行。我觉得这样影响代码可读性，故取消。</li>
+</ul>
+<h3 id="修改变量前后缀">修改变量前后缀</h3><p>静态成员是s，普通成员是m，有点意思</p>
+<p><img src="http://i4.tietuku.com/f623911b2a24b3ae.jpg" alt="变量前缀"></p>
+<h3 id="修改新建文件文件头">修改新建文件文件头</h3><p>每次建新类的话，对下面这段注释肯定很熟悉。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span><br><span class="line"> * Created by licheedev on 2015/5/2.</span><br><span class="line"> */</span></span><br></pre></td></tr></table></figure>
+<p><img src="http://i4.tietuku.com/11df21d9d347afcd.jpg" alt="通用文件头"></p>
+<p>上图就是通用的文件头，框住的地方是你系统的用户名，想个性化的话，可以改这里，至于哪里引用这个文件头的呢，就在隔壁。</p>
+<p><img src="http://i4.tietuku.com/17155e2a606bf083.jpg" alt="引用文件头"></p>
+<h3 id="修改文件编码为UTF-8">修改文件编码为UTF-8</h3><p>别坑队友，小伙伴们都统一改为UTF-8吧。</p>
+<p><img src="http://i4.tietuku.com/5c6399212e1bea83.jpg" alt="修改文件编码为UTF-8"></p>
+<h2 id="体验增强">体验增强</h2><h3 id="增强Live_Templates（Ctrl+J的智能提示模板）">增强Live Templates（<code>Ctrl+J</code>的智能提示模板）</h3><p>默认的Live Templates不够用，连foreach都没，幸好Github上的大神做了增强的模板，果断拿来用。</p>
+<blockquote>
+<p>idea-live-templates： <a href="https://github.com/keyboardsurfer/idea-live-templates" target="_blank" rel="external">https://github.com/keyboardsurfer/idea-live-templates</a></p>
+</blockquote>
+<p>文件下载后，找到下面这个目录：<br><code>&lt;android-studio&gt;\.AndroidStudio.2\config\templates</code>，<br>至于为什么是这个目录，麻烦往前补补 <a href="#idea-properties"><strong>修改idea.properties文件</strong></a> ,</p>
+<p>如果没有<code>templates</code>文件夹的话，自己手动建一个即可。</p>
+<p><img src="http://i4.tietuku.com/8ed6fb052db5d55e.jpg" alt="只要xml文件"></p>
+<p>把所有<code>*.xml</code>文件弄进那个文件夹，重新打开Android Studio，就能看到效果了。</p>
+<p><img src="http://i4.tietuku.com/3bfbf68635f3a38d.jpg" alt="修改foreach"></p>
+<p><code>foreach</code>那里要改一个设置，否则<code>for ($i$ : $data$) {</code>会被自动格式化为多行。<br>下面是<code>foreach</code>和<code>fbc</code>的动图演示</p>
+<p><img src="http://i4.tietuku.com/6d3e735486ae8a9d.gif" alt="foreach&amp;fbc"></p>
+<h1 id="おわり">おわり</h1><p><img src="http://i4.tietuku.com/46bec46a702f7b52.gif" alt="_(:з」∠)_"></p>
+<p>搞定，Android Studio基本设置教程暂时这样了，以后有新东西再更新，其他编译系统相关的暂时不是摸得很明白，就不乱来误人子弟了。<br>可累了。</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<blockquote>
+<p><strong>转载请注明原文出处 <a href="http://www.licheedev.com/2015/05/02/android-studio-settings/">http://www.licheedev.com/2015/05/02/android-studio-settings/</a> </strong></p>
+</blockquote>
+<p>这两天Google更新了Android Studio 1.2正式版，新版本的设置界面大变面，设置条目较旧版本进行了归类，不像以前那样列表长长的了。</p>
+<p>趁着安装新版本的机会，把常用的设置记录一下，放到博客里面，以作备忘。</p>]]>
+    
+    </summary>
+    
+      <category term="Android Studio" scheme="http://licheedev.com/tags/Android-Studio/"/>
+    
+      <category term="Android" scheme="http://licheedev.com/categories/Android/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[Windows下编译最新volley为jar包]]></title>
+    <link href="http://licheedev.com/2015/04/29/compile-volley/"/>
+    <id>http://licheedev.com/2015/04/29/compile-volley/</id>
+    <published>2015-04-29T06:10:59.000Z</published>
+    <updated>2015-06-12T15:54:57.150Z</updated>
+    <content type="html"><![CDATA[<p>蛋疼想自己编译个最新的volley jar用用，<br>随便搜了下方法，如这个 <a href="http://blog.csdn.net/wangjia55/article/details/41744181" target="_blank" rel="external">http://blog.csdn.net/wangjia55/article/details/41744181</a> ，<br>试着编译了下，结果各种报错，<br>最后强迫症发作，捣鼓出来了，<br>编译方式分两种，<a href="#ant"><strong><code>ant</code></strong></a>和<a href="#gradle"><strong><code>gradle</code></strong></a>的</p>
+<p></p><h2 id="ant">使用ant编译</h2><br>因为最新代码已经不在用ant改用gradle来构建工程，但是依然保留ant编译脚本，这里还是介绍一下，尽管比较麻烦<p></p>
+<h3 id="下载volley">下载volley</h3><p><code>git clone https://android.googlesource.com/platform/frameworks/volley</code><br><a id="more"></a></p>
+<h3 id="修改项目结构">修改项目结构</h3><ol>
+<li>进入<code>&lt;volley&gt;\src\main\</code>目录，将<code>java</code>文件夹重命名为<code>src</code>；</li>
+<li>将<code>&lt;volley&gt;\src\main\</code>文件夹里面的所有内容<code>剪切</code>到<code>&lt;volley&gt;</code>文件夹中；</li>
+<li>进入<code>&lt;volley&gt;\src\</code>目录，<code>删除</code>多余的<code>main</code>和<code>test</code>文件夹；</li>
+</ol>
+<h3 id="下载配置ant">下载配置ant</h3><blockquote>
+<p><strong>下载</strong> <a href="http://ant.apache.org/bindownload.cgi" target="_blank" rel="external">http://ant.apache.org/bindownload.cgi</a></p>
+</blockquote>
+<p>ant环境变量配置<br><figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">setx <span class="built_in">PATH</span> "<span class="envvar">%PATH%</span>;<span class="envvar">%%A</span>NT_HOME<span class="envvar">%%\</span>bin;<span class="envvar">%%A</span>NT_HOME<span class="envvar">%%\</span>lib" -m</span><br><span class="line">setx ANT_HOME "E:\DevTools\Others\apache-ant-<span class="number">1</span>.<span class="number">9</span>.<span class="number">4</span>" -m</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>P.S. <code>setx</code>是Windows Vista之后有的设置环境变量的工具，命令中的文件路径请按<code>实际情况</code>进行修改</p>
+</blockquote>
+<h3 id="配置Android_SDK环境变量">配置Android SDK环境变量</h3><figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">setx <span class="built_in">PATH</span> "<span class="envvar">%PATH%</span>;<span class="envvar">%%A</span>NDROID_HOME<span class="envvar">%%\</span>tools;<span class="envvar">%%A</span>NDROID_HOME<span class="envvar">%%\</span>platform-tools" -m</span><br><span class="line">setx ANDROID_HOME "E:\DevTools\AndroidStudio\sdk" -m</span><br></pre></td></tr></table></figure>
+<h3 id="更新anroid工程">更新anroid工程</h3><blockquote>
+<p>相关命令的使用说明可以用<code>android -h</code>来查看</p>
+</blockquote>
+<p><strong>首先</strong>cmd切换到<code>&lt;volley&gt;\</code>目录，运行<code>android list target</code>命令，查看已经安装的api的target id，这是待会编译用的api版本，选择适合的，记下id号（这个id号码跟api版本关系，完全是根据你安装了多少个api而定的），<br>如我要用最新的<code>api 22</code>来编译，这里就是<code>8</code>。<br><img src="http://i1.tietuku.com/a1423ea55fc86ee0.jpg" alt="target id"></p>
+<p><strong>然后</strong>运行<code>&gt;android - update lib-project -p . -t 8</code>（-t 后面的是刚才记下的target id号，自己按实际情况修改）更新工程。<br><img src="http://i1.tietuku.com/ccac55dd834cd8fb.jpg" alt="update lib-project"></p>
+<p><strong>之后</strong>会生成一些文件，打开其中的<code>project.properties</code>文件，<br>在文件的最后面加一句<code>renderscript.opt.level=O0</code>，保存。</p>
+<blockquote>
+<p>不加那句的话，等下用ant jar命令导出jar包会出错，参考<a href="https://stackoverflow.com/questions/11255805/use-ant-clean-test-with-the-newest-android-sdk-renderscript-opt-level-is" target="_blank" rel="external">Stack Overflow</a></p>
+</blockquote>
+<p><strong>最后</strong>运行<code>ant jar</code>命令即可，就可以在<code>bin</code>目录找到jar包了。<br><img src="http://i1.tietuku.com/fde7af3ac11a872f.jpg" alt="导出jar包"></p>
+<p></p><h2 id="gradle">使用gradle编译</h2><br>最新代码本身就是用gradle来构建的，所以简单很多<p></p>
+<h3 id="下载和配置gradle">下载和配置gradle</h3><blockquote>
+<p>下载 <a href="http://gradle.org/" target="_blank" rel="external">http://gradle.org/</a><br>正式版的Android Studio包含gradle，<br>在<code>&lt;android-studio\&gt;gradle\gradle-2.2.1</code>，自行选择用现成的还是重新下载</p>
+</blockquote>
+<p>配置环境变量<br><figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">setx <span class="built_in">PATH</span> "<span class="envvar">%PATH%</span>;<span class="envvar">%%G</span>RADLE_HOME<span class="envvar">%%\</span>bin" -m</span><br><span class="line">setx GRADLE_HOME "E:\DevTools\Others\gradle-<span class="number">2</span>.<span class="number">3</span>" -m</span><br><span class="line">setx GRADLE_USER_HOME "E:\DevWorks\.gradle" -m</span><br><span class="line">``` </span><br><span class="line">&gt; P.S. 其中前两项是配置可执行文件的<span class="built_in">PATH</span>，第三项是更改依赖仓库的位置，</span><br><span class="line">&gt; 默认情况下，依赖仓库在`C:\Users\&lt;username&gt;\.gradle`文件夹中，</span><br><span class="line">&gt; 我认为放在C盘不是个好的选择，因为这文件夹随着开发使用依赖库，而变得越来越大，</span><br><span class="line">&gt; 如果重装系统忘记备份，就悲剧了，得重新下载</span><br><span class="line"></span><br><span class="line">### 编译</span><br><span class="line">重新用git克隆一份volley源码，</span><br><span class="line">`git clone https://android.googlesource.com/platform/frameworks/volley`</span><br><span class="line">进入到`&lt;volley&gt;\`目录，打开`build.gradle`文件，找到</span><br><span class="line">```groovy </span><br><span class="line">buildscript &#123;</span><br><span class="line">    repositories &#123;</span><br><span class="line">        mavenCentral()</span><br><span class="line">    &#125;</span><br><span class="line">    dependencies &#123;</span><br><span class="line">        classpath 'com.android.tools.build:gradle:<span class="number">0</span>.<span class="number">14</span>.+'</span><br><span class="line">        // 当然，版本号可能跟我现在这个的不一样，</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>将其中的<code>&#39;com.android.tools.build:gradle:0.14.+&#39;</code><br>改成<code>&#39;com.android.tools.build:gradle:1.1.0&#39;</code></p>
+<blockquote>
+<p>这里的版本号到底怎么改，可以用Android Studio随便建一个工程，打开主module的build.gradle对照着改</p>
+</blockquote>
+<p>改完之后打开cmd，切换到<code>&lt;volley&gt;\</code>目录，<br>运行<code>gradle bundleRelease</code>，等待编译，<br>成功后可以找到<code>&lt;volley&gt;\build\intermediates\bundles\release\classes.jar</code>，即为编译后的jar包，重命名为<code>volley.jar</code>即可。</p>
+<h2 id="总结">总结</h2><p>上面说了这么多，其实只是强迫症犯了，想撇开IDE，用命令编译出个jar包来玩玩。<br>如果只需要使用volley的话，根本不用执着导出jar，有其他更方便的方法。<br>比如改了项目结构后，用Eclipse导入就可以用，Androd Studio更屌，改都不用改，直接导入为module就行。<br>不过有一颗折腾的心总是好的，反正也学到了新东西。</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>蛋疼想自己编译个最新的volley jar用用，<br>随便搜了下方法，如这个 <a href="http://blog.csdn.net/wangjia55/article/details/41744181">http://blog.csdn.net/wangjia55/article/details/41744181</a> ，<br>试着编译了下，结果各种报错，<br>最后强迫症发作，捣鼓出来了，<br>编译方式分两种，<a href="#ant"><strong><code>ant</code></strong></a>和<a href="#gradle"><strong><code>gradle</code></strong></a>的</p>
+<p><h2 id="ant">使用ant编译</h2><br>因为最新代码已经不在用ant改用gradle来构建工程，但是依然保留ant编译脚本，这里还是介绍一下，尽管比较麻烦</p>
+<h3 id="下载volley">下载volley</h3><p><code>git clone https://android.googlesource.com/platform/frameworks/volley</code><br>]]>
+    
+    </summary>
+    
+      <category term="volley" scheme="http://licheedev.com/tags/volley/"/>
+    
+      <category term="Android" scheme="http://licheedev.com/categories/Android/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[Pyhon学习笔记-1]]></title>
+    <link href="http://licheedev.com/2015/04/18/learn-python-1/"/>
+    <id>http://licheedev.com/2015/04/18/learn-python-1/</id>
+    <published>2015-04-18T14:50:14.000Z</published>
+    <updated>2015-06-13T16:13:49.957Z</updated>
+    <content type="html"><![CDATA[<h2 id="搭建开发环境">搭建开发环境</h2><p>下载 <a href="https://www.python.org/downloads/" target="_blank" rel="external">https://www.python.org/downloads/</a><br>Python分两个版本：2.x和3.x,两个版本不兼容，目前还有很多第三方库没有兼容3.x版本。所以这里下载2.x版本进行学习。<br>安装过程中选择<code>Add python.exe to Path</code>，自动添加python执行文件到Path环境变量中。<br>或者手动添加<br><code>&lt;Python文件夹所在目录&gt;\Python27\;&lt;Python文件夹所在目录&gt;\Python27\Scripts</code><br><a id="more"></a></p>
+<h2 id="Python解析器">Python解析器</h2><p>参考 <a href="http://www.liaoxuefeng.com/wiki/001374738125095c955c1e6d8bb493182103fac9270762a000/001407375700558864523211a5049c4983176de304549c8000" target="_blank" rel="external">廖雪峰的官方网站</a></p>
+<h3 id="python交互环境">python交互环境</h3><p>进入Python交互环境<br>在命令行中敲<code>python</code><br>退出python交互环境<br>输入<code>exit()</code><br><img src="http://i2.tietuku.com/0238eba291bc3aac.jpg" alt="python交互环境"></p>
+<h3 id="运行python脚本">运行python脚本</h3><p>在命令行中敲<code>python xxx.py</code></p>
+<h2 id="注释">注释</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#单行注释</span></span><br></pre></td></tr></table></figure>
+<h2 id="输入输出">输入输出</h2><h3 id="输出">输出</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">print</span> <span class="string">"hello,world"</span></span><br><span class="line"><span class="comment">#输出：hello,world</span></span><br><span class="line"><span class="keyword">print</span> <span class="string">"hello"</span>,<span class="string">"world"</span></span><br><span class="line"><span class="comment">#输出：hello world</span></span><br><span class="line"><span class="comment">#其中","间隔的地方输入一个空格</span></span><br></pre></td></tr></table></figure>
+<h3 id="输入">输入</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">firstname = raw_input()</span><br><span class="line"><span class="comment">#输入：John</span></span><br><span class="line">lastname = raw_input()</span><br><span class="line"><span class="comment">#输入：Lee</span></span><br><span class="line"><span class="keyword">print</span> firstname, lastname</span><br><span class="line"><span class="comment">#输出：John Lee</span></span><br><span class="line"></span><br><span class="line">domain = raw_input(<span class="string">"input your domain:"</span>)</span><br><span class="line"><span class="keyword">print</span> <span class="string">"the domain is"</span>,domain</span><br><span class="line"><span class="comment">#打印出：</span></span><br><span class="line"><span class="comment">#input your domain:licheedev.com</span></span><br><span class="line"><span class="comment">#the domain is licheedev.com</span></span><br></pre></td></tr></table></figure>
+<p><img src="http://i2.tietuku.com/4c97058667e310d9.jpg" alt="输入输出"></p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<h2 id="搭建开发环境">搭建开发环境</h2><p>下载 <a href="https://www.python.org/downloads/">https://www.python.org/downloads/</a><br>Python分两个版本：2.x和3.x,两个版本不兼容，目前还有很多第三方库没有兼容3.x版本。所以这里下载2.x版本进行学习。<br>安装过程中选择<code>Add python.exe to Path</code>，自动添加python执行文件到Path环境变量中。<br>或者手动添加<br><code>&lt;Python文件夹所在目录&gt;\Python27\;&lt;Python文件夹所在目录&gt;\Python27\Scripts</code><br>]]>
+    
+    </summary>
+    
+      <category term="python" scheme="http://licheedev.com/tags/python/"/>
+    
+      <category term="python" scheme="http://licheedev.com/categories/python/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[ViewHolder模式&无ViewHolder模式ListView性能对比]]></title>
+    <link href="http://licheedev.com/2015/03/23/no-viewholder-listview-performance/"/>
+    <id>http://licheedev.com/2015/03/23/no-viewholder-listview-performance/</id>
+    <published>2015-03-23T13:49:39.000Z</published>
+    <updated>2015-06-13T16:13:23.199Z</updated>
+    <content type="html"><![CDATA[<p>前些天转述了一篇关于无ViewHolder模式的ListView的文章</p>
+<blockquote>
+<p><a href="http://www.licheedev.com/2015/03/21/no-viewholder-listview/" target="_blank" rel="external">http://www.licheedev.com/2015/03/21/no-viewholder-listview/</a></p>
+</blockquote>
+<p>有网友表示质疑，说那种方法不及传统的ViewHolder的性能，加载大规模数据的数据时，速度明显比ViewHolder模式的慢。</p>
+<p>好吧，其实我也没测试过，单看原理，无ViewHolder模式少创建了ViewHolder对象和各种setTag()和getTag()，应该更快才对。<br>不过毕竟没对比测试过，也不好下定义，所以今晚就蛋疼测试了一下。<br><a id="more"></a></p>
+<h2 id="测试方案">测试方案</h2><p>首先定制测试方案，测试使用<code>控制变量法</code>。<br>除了创建ItemView对象和holder对象有区别外，其他逻辑基本一样，最大限度减少方法嵌套（毕竟调用方法本身就会消耗资源，调用次数多了，着实会影响性能），具体代码方案见下文描述。<br>两种模式列表数量各位10000，分别测试5次，交替进行测试。<br>每次测试的时候都会使用TraceView跟踪method信息，以便最后进行数据分析。</p>
+<h2 id="代码说明">代码说明</h2><p>测试代码基于上一篇文章的代码进行修改。</p>
+<blockquote>
+<p>完整代码见Github <a href="https://github.com/licheedev/NoViewHolderListViewPerformanceTest" target="_blank" rel="external">https://github.com/licheedev/NoViewHolderListViewPerformanceTest</a></p>
+</blockquote>
+<p>代码演示效果：<br><img src="http://i2.tietuku.com/dcb5a1b07015c979.gif" alt="演示"></p>
+<h3 id="基础代码">基础代码</h3><h4 id="MainActivity-java_主界面">MainActivity.java 主界面</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MainActivity</span> <span class="keyword">extends</span> <span class="title">Activity</span> <span class="keyword">implements</span> <span class="title">OnClickListener</span></span>&#123;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">private</span> Button btnHolder;</span><br><span class="line">	<span class="keyword">private</span> Button btnNoHolder;</span><br><span class="line">	</span><br><span class="line">	···</span><br><span class="line"></span><br><span class="line">	<span class="annotation">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(View v)</span> </span>&#123;</span><br><span class="line">		Intent intent = <span class="keyword">new</span> Intent(<span class="keyword">this</span>, ListActivity.class);</span><br><span class="line">		<span class="keyword">boolean</span> useHolder = <span class="keyword">false</span>;</span><br><span class="line">		<span class="keyword">if</span>(v.getId() == R.id.btnHolder) &#123;</span><br><span class="line">			useHolder = <span class="keyword">true</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		intent.putExtra(<span class="string">"useHolder"</span>, useHolder);</span><br><span class="line">		startActivity(intent);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>点击按钮进入列表界面，<code>useHolder</code>用以表示ListView是否使用holder模式。</p>
+<h4 id="Item-java_列表数据">Item.java 列表数据</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Item</span> </span>&#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span> imgId;</span><br><span class="line">	<span class="keyword">private</span> String title;</span><br><span class="line">	<span class="keyword">private</span> String content;</span><br><span class="line">	···</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="ListActivity-java_列表界面">ListActivity.java 列表界面</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ListActivity</span> <span class="keyword">extends</span> <span class="title">Activity</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">boolean</span> useHolder;</span><br><span class="line">	<span class="keyword">private</span> ListView listView;</span><br><span class="line">	<span class="keyword">private</span> ArrayAdapter&lt;Item&gt; adapter;</span><br><span class="line">	<span class="keyword">private</span> List&lt;Item&gt; items;</span><br><span class="line"></span><br><span class="line">	<span class="annotation">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">		setContentView(R.layout.activity_list);</span><br><span class="line">		Intent intent = getIntent();</span><br><span class="line">		<span class="keyword">if</span> (intent != <span class="keyword">null</span>) &#123;</span><br><span class="line">			useHolder = intent.getBooleanExtra(<span class="string">"useHolder"</span>, <span class="keyword">false</span>);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">int</span> titleId = useHolder ? R.string.title_holder : R.string.title_noholder;</span><br><span class="line">		setTitle(titleId);</span><br><span class="line">		init();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		listView = (ListView) findViewById(R.id.listView);</span><br><span class="line">		initData(<span class="number">10000</span>);</span><br><span class="line">		<span class="keyword">if</span> (useHolder) &#123;</span><br><span class="line">			<span class="comment">// 跟踪holder模式</span></span><br><span class="line">			Debug.startMethodTracing(<span class="string">"holder"</span> + System.currentTimeMillis());</span><br><span class="line">			adapter = <span class="keyword">new</span> HolderAdapter(<span class="keyword">this</span>, items);</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			<span class="comment">// 跟踪noholder模式</span></span><br><span class="line">			Debug.startMethodTracing(<span class="string">"noholder"</span> + System.currentTimeMillis());</span><br><span class="line">			adapter = <span class="keyword">new</span> NoHolderAdapter(<span class="keyword">this</span>, items);</span><br><span class="line">		&#125;</span><br><span class="line">		listView.setAdapter(adapter);</span><br><span class="line">		<span class="comment">// 延时1000，确保ListView加载好数据后，让ListView自动平滑滚到到最后一项</span></span><br><span class="line">		listView.postDelayed(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line"></span><br><span class="line">			<span class="annotation">@Override</span></span><br><span class="line">			<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">				listView.smoothScrollToPosition(items.size() - <span class="number">1</span>);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;, <span class="number">1000</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 初始化数据</span></span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">initData</span><span class="params">(<span class="keyword">int</span> num)</span> </span>&#123;</span><br><span class="line">		items = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; num; i++) &#123;</span><br><span class="line">			Item item = <span class="keyword">new</span> Item();</span><br><span class="line">			item.setImgId(i % <span class="number">2</span> == <span class="number">0</span> ? R.drawable.img_doge : R.drawable.img_cat);</span><br><span class="line">			item.setTitle(<span class="string">"Title No."</span> + i);</span><br><span class="line">			item.setContent(<span class="string">"The content of No."</span> + i);</span><br><span class="line">			items.add(item);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="annotation">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onStop</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">super</span>.onStop();</span><br><span class="line">		Debug.stopMethodTracing();<span class="comment">// 退出窗口时结束跟踪</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>创建adapter时，开始记录跟踪信息，ListView设置adapter后延迟1秒，<br>使用<code>smoothScrollToPosition(items.size() - 1)</code>方法，自动平滑滚动列表到最后一项，<br>等待滚动结束后，退出列表界面，结束记录跟踪信息。</p>
+<h3 id="ViewHolder模式">ViewHolder模式</h3><h4 id="HolderAdapter-java_holder模式用的adapter">HolderAdapter.java holder模式用的adapter</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HolderAdapter</span> <span class="keyword">extends</span> <span class="title">ArrayAdapter</span>&lt;<span class="title">Item</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">HolderAdapter</span><span class="params">(Context context, List&lt;Item&gt; objects)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">super</span>(context, <span class="number">0</span>, objects);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="annotation">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> View <span class="title">getView</span><span class="params">(<span class="keyword">int</span> position, View convertView, ViewGroup parent)</span> </span>&#123;</span><br><span class="line">		ViewHolder holder = <span class="keyword">null</span>;</span><br><span class="line">		<span class="keyword">if</span> (convertView == <span class="keyword">null</span>) &#123;</span><br><span class="line">			convertView = LayoutInflater.from(parent.getContext()).inflate(</span><br><span class="line">					R.layout.item_holder, parent, <span class="keyword">false</span>);</span><br><span class="line">			holder = <span class="keyword">new</span> ViewHolder();</span><br><span class="line">			holder.ivImage = (ImageView) convertView.findViewById(R.id.iv_image);</span><br><span class="line">			holder.tvTitle = (TextView) convertView.findViewById(R.id.tv_title);</span><br><span class="line">			holder.tvContent = (TextView) convertView.findViewById(R.id.tv_content);</span><br><span class="line">			convertView.setTag(holder);</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			holder = (ViewHolder) convertView.getTag();</span><br><span class="line">		&#125;</span><br><span class="line">		Item item = getItem(position);</span><br><span class="line">		holder.ivImage.setImageResource(item.getImgId());</span><br><span class="line">		holder.tvTitle.setText(item.getTitle());</span><br><span class="line">		holder.tvContent.setText(item.getContent());</span><br><span class="line">		<span class="keyword">return</span> convertView;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">ViewHolder</span> </span>&#123;</span><br><span class="line">		<span class="keyword">public</span> ImageView ivImage;</span><br><span class="line">		<span class="keyword">public</span> TextView tvTitle;</span><br><span class="line">		<span class="keyword">public</span> TextView tvContent;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="item_holder-xml_holder模式用的item布局">item_holder.xml holder模式用的item布局</h4><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="pi">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">RelativeLayout</span> <span class="attribute">xmlns:android</span>=<span class="value">"http://schemas.android.com/apk/res/android"</span></span><br><span class="line">    <span class="attribute">android:layout_width</span>=<span class="value">"match_parent"</span></span><br><span class="line">    <span class="attribute">android:layout_height</span>=<span class="value">"64dp"</span></span><br><span class="line">    <span class="attribute">android:padding</span>=<span class="value">"8dp"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="title">ImageView</span></span><br><span class="line">        ··· /&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="title">TextView</span></span><br><span class="line">        ··· /&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="title">TextView</span></span><br><span class="line">        ··· /&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="title">RelativeLayout</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="No-ViewHolder模式">No-ViewHolder模式</h3><h4 id="ItemView-java_noholder模式用的item_view">ItemView.java noholder模式用的item view</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ItemView</span> <span class="keyword">extends</span> <span class="title">RelativeLayout</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> ImageView ivImage;</span><br><span class="line">	<span class="keyword">public</span> TextView tvTitle;</span><br><span class="line">	<span class="keyword">public</span> TextView tvContent;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">ItemView</span><span class="params">(Context context, AttributeSet attrs)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">super</span>(context, attrs);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 填充xml初始化ItemView,并获取子View引用</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> ItemView <span class="title">newInstance</span><span class="params">(ViewGroup parent)</span> </span>&#123;</span><br><span class="line">		ItemView view = (ItemView) LayoutInflater.from(parent.getContext())</span><br><span class="line">				.inflate(R.layout.item_view, parent, <span class="keyword">false</span>);</span><br><span class="line">		view.ivImage = (ImageView) view.findViewById(R.id.iv_image);</span><br><span class="line">		view.tvTitle = (TextView) view.findViewById(R.id.tv_title);</span><br><span class="line">		view.tvContent = (TextView) view.findViewById(R.id.tv_content);</span><br><span class="line">		<span class="keyword">return</span> view;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>相比上一篇文章的ItemView，这里为了减少方法嵌套，把各个子View成员声明为public，在adatper中会直接修改这些子View的属性，而不是通过在ItemView中封装方法进行修改。</p>
+<h4 id="NoHolderAdapter-java_noholder模式用的adapter">NoHolderAdapter.java noholder模式用的adapter</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NoHolderAdapter</span> <span class="keyword">extends</span> <span class="title">ArrayAdapter</span>&lt;<span class="title">Item</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">NoHolderAdapter</span><span class="params">(Context context, List&lt;Item&gt; objects)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">super</span>(context, <span class="number">0</span>, objects);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="annotation">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> View <span class="title">getView</span><span class="params">(<span class="keyword">int</span> position, View convertView, ViewGroup parent)</span> </span>&#123;</span><br><span class="line">		ItemView view = (ItemView) convertView;</span><br><span class="line">		<span class="keyword">if</span> (view == <span class="keyword">null</span>) &#123;</span><br><span class="line">			view = ItemView.newInstance(parent);</span><br><span class="line">		&#125;</span><br><span class="line">		Item item = getItem(position);</span><br><span class="line">		view.ivImage.setImageResource(item.getImgId());</span><br><span class="line">		view.tvTitle.setText(item.getTitle());</span><br><span class="line">		view.tvContent.setText(item.getContent());</span><br><span class="line">		<span class="keyword">return</span> view;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里没有调用上篇文章封装的<code>ItemView.populateData()</code>方法来修改各个item视图的内容，而是直接修改view暴露出来的各个子View成员，目的是为了减少方法嵌套调用，最大限度地与holder模式的代码保持一致。</p>
+<h4 id="item_view-xml_noholder模式用的item布局">item_view.xml noholder模式用的item布局</h4><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="pi">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">com.licheetec.noholderlistviewdemo.ItemView</span> <span class="attribute">xmlns:android</span>=<span class="value">"http://schemas.android.com/apk/res/android"</span></span><br><span class="line">    <span class="attribute">android:layout_width</span>=<span class="value">"match_parent"</span></span><br><span class="line">    <span class="attribute">android:layout_height</span>=<span class="value">"64dp"</span></span><br><span class="line">    <span class="attribute">android:padding</span>=<span class="value">"8dp"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="title">ImageView</span></span><br><span class="line">        ··· /&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="title">TextView</span></span><br><span class="line">        ··· /&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="title">TextView</span></span><br><span class="line">        ··· /&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="title">com.licheetec.noholderlistviewdemo.ItemView</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>除了根节点不同，其他跟holder模式的一样（别吐槽什么代码复用，懒得搞这么多，直接复制改名，更酸爽）。</p>
+<h2 id="测试结果分析">测试结果分析</h2><p>经过一轮蛋疼的等待，终于跑完了，2*5共10个trace文件<br><img src="http://i3.tietuku.com/97e4113d7912b7a9.jpg" alt="TraceView文件"><br>用sdk附带的<code>Android Device Monitor</code>工具（在<code>&lt;sdk&gt;/tools/monitor.bat</code>）打开，如图<br><img src="http://i2.tietuku.com/077e4678db3c1c8f.jpg" alt="monitor"><br>TraceView视图上面参数很多，具体参数意义可以参考这篇文章</p>
+<blockquote>
+<p><a href="http://blog.csdn.net/wwj_748/article/details/8913862" target="_blank" rel="external">http://blog.csdn.net/wwj_748/article/details/8913862</a></p>
+</blockquote>
+<p>针对这次测试，我们需要测量adapter的getView()方法的耗时，主要关注下列参数</p>
+<blockquote>
+<p>Incl Cpu Time：方法执行的总时间（包括调用子函数所消耗的时间）<br>Incl Real Time：方法真正被执行的时间。<br>Cpu Time/Call：方法每次被执行的时间<br>Real Time/Call：方法真实被执行的时间</p>
+</blockquote>
+<h3 id="ViewHolder模式测试结果">ViewHolder模式测试结果</h3><p><img src="http://i3.tietuku.com/d7d06abeb2dbf013.jpg" alt="holder1"><br><img src="http://i3.tietuku.com/aaa42cf4ecbe22ad.jpg" alt="holder2"><br><img src="http://i3.tietuku.com/4f54a274ad1808a2.jpg" alt="holder3"><br><img src="http://i3.tietuku.com/880b522001c427e6.jpg" alt="holder4"><br><img src="http://i3.tietuku.com/828ca42ee0e42b0f.jpg" alt="holder5"></p>
+<h3 id="No-ViewHolder模式测试结果">No-ViewHolder模式测试结果</h3><p><img src="http://i2.tietuku.com/36f9ee1c7833253d.jpg" alt="noholder1"><br><img src="http://i2.tietuku.com/32e98609e8b3217a.jpg" alt="noholder2"><br><img src="http://i2.tietuku.com/3114fec3d43db865.jpg" alt="noholder3"><br><img src="http://i2.tietuku.com/79250fc9b950b529.jpg" alt="noholder4"><br><img src="http://i2.tietuku.com/aec7de757b40c243.jpg" alt="noholder5"></p>
+<h3 id="汇总">汇总</h3><p><img src="http://i3.tietuku.com/a1d28c640e0c2a18.jpg" alt="汇总"><br>第一次运行的时候的数据比较特殊，其他就比较平均，因为我们无法确定CPU到底怎么分配资源，所以每次数据都会有波动，那么求平均数也没意义。<br>两种模式都各有输赢，不过差别不大，无法确定到底哪一种更优。</p>
+<h2 id="总结">总结</h2><p>测试结束，说实话，比较郁闷，实在没法确定哪种模式更优。两种模式的代码，只有在创建ItemView或ViewHolder对象的时候有所不同，而因为要复用convertView对象的关系，就算我们刷了100W个数据，创建ItemView或者ViewHolder的个数，顶多也就同一时间屏幕能显示的列表项目的个数，后面的直接复用convertView，就不存在什么性能上的差别。<br>不过还是能得出一个结论，就是<strong>NoViewHolder模式的性能并不比ViewHolder模式低</strong>，<br>而由于不用重复调用setTag()和getTag()的关系，性能可能更好。<br>当然，前提是减少方法嵌套，不过这样就有点破坏封装性，鱼与熊掌不能兼得，反正具体问题具体分析，看情况用呗。</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>前些天转述了一篇关于无ViewHolder模式的ListView的文章</p>
+<blockquote>
+<p><a href="http://www.licheedev.com/2015/03/21/no-viewholder-listview/">http://www.licheedev.com/2015/03/21/no-viewholder-listview/</a></p>
+</blockquote>
+<p>有网友表示质疑，说那种方法不及传统的ViewHolder的性能，加载大规模数据的数据时，速度明显比ViewHolder模式的慢。</p>
+<p>好吧，其实我也没测试过，单看原理，无ViewHolder模式少创建了ViewHolder对象和各种setTag()和getTag()，应该更快才对。<br>不过毕竟没对比测试过，也不好下定义，所以今晚就蛋疼测试了一下。<br>]]>
+    
+    </summary>
+    
+      <category term="ListView" scheme="http://licheedev.com/tags/ListView/"/>
+    
+      <category term="ViewHolder" scheme="http://licheedev.com/tags/ViewHolder/"/>
+    
+      <category term="Android" scheme="http://licheedev.com/categories/Android/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[摆脱ViewHolder，一种无需ViewHolder的高效ListView写法]]></title>
+    <link href="http://licheedev.com/2015/03/21/no-viewholder-listview/"/>
+    <id>http://licheedev.com/2015/03/21/no-viewholder-listview/</id>
+    <published>2015-03-21T14:17:14.000Z</published>
+    <updated>2015-06-13T16:13:01.336Z</updated>
+    <content type="html"><![CDATA[<p>使用ListView来展示列表数据，基本上是每个Android猿必须掌握的技能，而ListView的基本优化技巧，基本也烂大街了，无非是复用convertView对象还有使用ViewHolder来缓存Item中各个子View的引用。<br>最近看到一篇文章，描述了一种非主流的高效的ListView写法，无需创建ViewHolder类和holder对象，不用setTag()和getTag()，感觉效率更高。</p>
+<p>原文见</p>
+<blockquote>
+<p><a href="http://www.bignerdranch.com/blog/customizing-android-listview-rows-subclassing/" target="_blank" rel="external">http://www.bignerdranch.com/blog/customizing-android-listview-rows-subclassing/</a></p>
+</blockquote>
+<p>原文作者通过创建RelativeLayout子类（这里ListView各item的布局的根布局是RelativeLayout，根据实际情况而定）来封装所有自定义操作，如findViewById各个子View，填充数据等。<br><a id="more"></a></p>
+<h3 id="原文作者不喜欢ViewHolder的原因">原文作者不喜欢ViewHolder的原因</h3><ul>
+<li>ViewHolder模式会在Adapter的getView(…)方法中干了太多事。</li>
+<li>ViewHolder类太过公式化，创建和设置holder让人累觉不爱。</li>
+<li>View.getTag()得到的对象需要强转为正确的holder类型，坑（查不到kludgy的翻译，只能这样了，坑）。</li>
+<li>因为adapter/holder需要知道代表列表各项的view的内部结构，有违封装性。</li>
+</ul>
+<h3 id="无需ViewHolder的写法">无需ViewHolder的写法</h3><p>出于复用布局的目的，原文作者定义了两个布局文件和使用merge标签来描述item的view，不过我觉得这不是这个写法的重点，所以改了一下，只是简单地定义了一个布局文件来描述item view。<br>先看看Demo截图<br><img src="http://i3.tietuku.com/91ae7225d6e088c8.jpg" alt="截图"></p>
+<h4 id="完整代码猛戳_这里">完整代码猛戳 <a href="https://github.com/licheedev/NoHolderListViewDemo" target="_blank" rel="external"><strong>这里</strong></a></h4><p><strong>1.</strong> 定义一个<code>Item</code>类来定义列表数据。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Item</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> imgId;</span><br><span class="line">    <span class="keyword">private</span> String title;</span><br><span class="line">    <span class="keyword">private</span> String content;</span><br><span class="line">    ...getter...setter...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>2.</strong> 定义item view的布局（见<a href="https://github.com/licheedev/NoHolderListViewDemo/blob/master/NoHolderListViewDemo/app/src/main/res/layout/item_view.xml" target="_blank" rel="external"><code>item_view.xml</code></a>）。<br><strong>3.</strong> 自定义<code>ItemView</code>类，继承<code>步骤2</code>中定义的布局的根布局（这里是<code>RelativeLayout</code>），实现参数为<code>(Context context, AttributeSet attrs)</code>或<code>(Context context, AttributeSet attrs, int defStyle)</code>的构造方法，并添加用于获取子View对象引用、获取ItemView对象和填充数据的方法，具体代码如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ItemView</span> <span class="keyword">extends</span> <span class="title">RelativeLayout</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> ImageView ivImage;</span><br><span class="line">    <span class="keyword">private</span> TextView tvTitle;</span><br><span class="line">    <span class="keyword">private</span> TextView tvContent;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ItemView</span><span class="params">(Context context, AttributeSet attrs)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(context, attrs);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取ItemView</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> ItemView <span class="title">newInstance</span><span class="params">(ViewGroup parent)</span> </span>&#123;</span><br><span class="line">        ItemView view = (ItemView) LayoutInflater.from(parent.getContext()).inflate(R.layout.item_view,parent,<span class="keyword">false</span>);</span><br><span class="line">        view.setupChildren();</span><br><span class="line">        <span class="keyword">return</span> view;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取子View对象的引用</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">setupChildren</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        ivImage = (ImageView) findViewById(R.id.iv_image);</span><br><span class="line">        tvTitle = (TextView) findViewById(R.id.tv_title);</span><br><span class="line">        tvContent = (TextView) findViewById(R.id.tv_content);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 填充数据</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">populateData</span><span class="params">(Item item)</span> </span>&#123;</span><br><span class="line">        ivImage.setImageResource(item.getImgId());</span><br><span class="line">        tvTitle.setText(item.getTitle());</span><br><span class="line">        tvContent.setText(item.getContent());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>  需要注意的是，有网友反馈，说参照原文那样改写，出现异常</p>
+<blockquote>
+<p>03-22 10:11:09.340: E/AndroidRuntime(1417): android.view.InflateException: Binary XML file line #1: Error inflating class com.xxxx.ItemView<br>….<br>03-22 10:11:09.340: E/AndroidRuntime(1417): Caused by: java.lang.NoSuchMethodException: <init> [class android.content.Context, interface android.util.AttributeSet]</init></p>
+</blockquote>
+<p>  分析最后一个“Caused by”异常消息，应该是填充xml初始化ItemView的时候，<br>调用的是参数为<code>(Context context, AttributeSet attrs)</code>的构造方法，<br>而原文用的是参数为<code>(Context context, AttributeSet attrs, int defStyle)</code>的构造方法，如果按照原文那样写的话，就有可能出现这个找不到方法的异常，<br>只要按照log的提示，修改为需要的那种构造方法就好。</p>
+<p><strong>4.</strong> 创建ListView用的adapter类（<code>ItemAdapter</code>）。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ItemAdapter</span> <span class="keyword">extends</span> <span class="title">ArrayAdapter</span>&lt;<span class="title">Item</span>&gt; </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ItemAdapter</span><span class="params">(Context context, List&lt;Item&gt; objects)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(context, <span class="number">0</span>, objects);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="annotation">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> View <span class="title">getView</span><span class="params">(<span class="keyword">int</span> position, View convertView, ViewGroup parent)</span> </span>&#123;</span><br><span class="line">        ItemView view = (ItemView) convertView;</span><br><span class="line">        <span class="keyword">if</span> (view == <span class="keyword">null</span>) &#123;</span><br><span class="line">            view = ItemView.newInstance(parent);</span><br><span class="line">        &#125;</span><br><span class="line">        view.populateData(getItem(position));</span><br><span class="line">        <span class="keyword">return</span> view;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>5.</strong> （<code>很重要，我经常会忘了这步</code>）把item view中布局（item_view.xml）的<code>根标签</code>，改为<code>ItemView</code>。<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="pi">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">com.licheetec.noholderlistviewdemo.ItemView</span> <span class="attribute">xmlns:android</span>=<span class="value">"http://schemas.android.com/apk/res/android"</span></span><br><span class="line">    <span class="attribute">android:layout_width</span>=<span class="value">"match_parent"</span></span><br><span class="line">    <span class="attribute">android:layout_height</span>=<span class="value">"64dp"</span></span><br><span class="line">    <span class="attribute">android:padding</span>=<span class="value">"8dp"</span>&gt;</span></span><br><span class="line">    </span><br><span class="line">    <span class="tag">&lt;<span class="title">ImageView</span></span><br><span class="line">        <span class="attribute">android:id</span>=<span class="value">"@+id/iv_image"</span></span><br><span class="line">       <span class="attribute">...</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="title">TextView</span></span><br><span class="line">        <span class="attribute">android:id</span>=<span class="value">"@+id/tv_title"</span></span><br><span class="line">        <span class="attribute">...</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="title">TextView</span></span><br><span class="line">        <span class="attribute">android:id</span>=<span class="value">"@+id/tv_content"</span></span><br><span class="line">        <span class="attribute">...</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">com.licheetec.noholderlistviewdemo.ItemView</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>6.</strong> 剩下的就是在activity获取和设置ListView了。</p>
+<h3 id="总结这种写法的优势">总结这种写法的优势</h3><ul>
+<li>Adapter的代码会变得极其简洁</li>
+<li>很容易通过代码和xml文件来创建ItemView</li>
+<li>以后有需要更改，只需要对布局文件和ItemView进行动刀即可</li>
+<li>整个过程无需创建额外的holder类和对象</li>
+</ul>
+<p>好了，基本就这样，转述可能跟原文有些出入，有能力的话可以看原文怎么说明的。</p>
+<blockquote>
+<p><strong>文章地址 <a href="http://www.licheedev.com/2015/03/21/no-viewholder-listview/" target="_blank" rel="external">http://www.licheedev.com/2015/03/21/no-viewholder-listview/</a> 转载请注明出处</strong></p>
+</blockquote>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>使用ListView来展示列表数据，基本上是每个Android猿必须掌握的技能，而ListView的基本优化技巧，基本也烂大街了，无非是复用convertView对象还有使用ViewHolder来缓存Item中各个子View的引用。<br>最近看到一篇文章，描述了一种非主流的高效的ListView写法，无需创建ViewHolder类和holder对象，不用setTag()和getTag()，感觉效率更高。</p>
+<p>原文见</p>
+<blockquote>
+<p><a href="http://www.bignerdranch.com/blog/customizing-android-listview-rows-subclassing/">http://www.bignerdranch.com/blog/customizing-android-listview-rows-subclassing/</a></p>
+</blockquote>
+<p>原文作者通过创建RelativeLayout子类（这里ListView各item的布局的根布局是RelativeLayout，根据实际情况而定）来封装所有自定义操作，如findViewById各个子View，填充数据等。<br>]]>
+    
+    </summary>
+    
+      <category term="ListView" scheme="http://licheedev.com/tags/ListView/"/>
+    
+      <category term="ViewHolder" scheme="http://licheedev.com/tags/ViewHolder/"/>
+    
+      <category term="Android" scheme="http://licheedev.com/categories/Android/"/>
+    
+  </entry>
+  
+</feed>

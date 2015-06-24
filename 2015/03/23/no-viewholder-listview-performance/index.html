@@ -1,0 +1,310 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>ViewHolder模式&amp;无ViewHolder模式ListView性能对比 | LicheeDev-某黎的博客</title>
+  <meta name="author" content="John Lee">
+  
+  <meta name="description" content="黎某人的博客。乱七八糟都记点。">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="ViewHolder模式&amp;无ViewHolder模式ListView性能对比"/>
+  <meta property="og:site_name" content="LicheeDev-某黎的博客"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  <link href="/favicon.png" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="LicheeDev-某黎的博客" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.css" rel="stylesheet">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+<script>
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+	ga('create', 'UA-64082407-1', 'auto');
+	ga('send', 'pageview');
+
+</script>
+
+
+</head>
+
+
+<body>
+  <header id="header" class="inner"><div class="alignleft">
+  <h1><a href="/">LicheeDev-某黎的博客</a></h1>
+  <h2><a href="/">写博客的时候，我会假装四处看风景</a></h2>
+</div>
+<nav id="main-nav" class="alignright">
+  <ul>
+    
+      <li><a href="/">首页</a></li>
+    
+      <li><a href="/archives">归档</a></li>
+    
+      <li><a href="/about">关于</a></li>
+    
+      <li><a href="/atom.xml">订阅鄙站</a></li>
+    
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+<div class="clearfix"></div></header>
+  <div id="content" class="inner">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2015-03-23T13:49:39.000Z"><a href="/2015/03/23/no-viewholder-listview-performance/">2015-03-23</a></time>
+      
+      
+  
+    <h1 class="title">ViewHolder模式&amp;无ViewHolder模式ListView性能对比</h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <p>前些天转述了一篇关于无ViewHolder模式的ListView的文章</p>
+<blockquote>
+<p><a href="http://www.licheedev.com/2015/03/21/no-viewholder-listview/" target="_blank" rel="external">http://www.licheedev.com/2015/03/21/no-viewholder-listview/</a></p>
+</blockquote>
+<p>有网友表示质疑，说那种方法不及传统的ViewHolder的性能，加载大规模数据的数据时，速度明显比ViewHolder模式的慢。</p>
+<p>好吧，其实我也没测试过，单看原理，无ViewHolder模式少创建了ViewHolder对象和各种setTag()和getTag()，应该更快才对。<br>不过毕竟没对比测试过，也不好下定义，所以今晚就蛋疼测试了一下。<br><a id="more"></a></p>
+<h2 id="测试方案">测试方案</h2><p>首先定制测试方案，测试使用<code>控制变量法</code>。<br>除了创建ItemView对象和holder对象有区别外，其他逻辑基本一样，最大限度减少方法嵌套（毕竟调用方法本身就会消耗资源，调用次数多了，着实会影响性能），具体代码方案见下文描述。<br>两种模式列表数量各位10000，分别测试5次，交替进行测试。<br>每次测试的时候都会使用TraceView跟踪method信息，以便最后进行数据分析。</p>
+<h2 id="代码说明">代码说明</h2><p>测试代码基于上一篇文章的代码进行修改。</p>
+<blockquote>
+<p>完整代码见Github <a href="https://github.com/licheedev/NoViewHolderListViewPerformanceTest" target="_blank" rel="external">https://github.com/licheedev/NoViewHolderListViewPerformanceTest</a></p>
+</blockquote>
+<p>代码演示效果：<br><img src="http://i2.tietuku.com/dcb5a1b07015c979.gif" alt="演示"></p>
+<h3 id="基础代码">基础代码</h3><h4 id="MainActivity-java_主界面">MainActivity.java 主界面</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MainActivity</span> <span class="keyword">extends</span> <span class="title">Activity</span> <span class="keyword">implements</span> <span class="title">OnClickListener</span></span>&#123;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">private</span> Button btnHolder;</span><br><span class="line">	<span class="keyword">private</span> Button btnNoHolder;</span><br><span class="line">	</span><br><span class="line">	···</span><br><span class="line"></span><br><span class="line">	<span class="annotation">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(View v)</span> </span>&#123;</span><br><span class="line">		Intent intent = <span class="keyword">new</span> Intent(<span class="keyword">this</span>, ListActivity.class);</span><br><span class="line">		<span class="keyword">boolean</span> useHolder = <span class="keyword">false</span>;</span><br><span class="line">		<span class="keyword">if</span>(v.getId() == R.id.btnHolder) &#123;</span><br><span class="line">			useHolder = <span class="keyword">true</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		intent.putExtra(<span class="string">"useHolder"</span>, useHolder);</span><br><span class="line">		startActivity(intent);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>点击按钮进入列表界面，<code>useHolder</code>用以表示ListView是否使用holder模式。</p>
+<h4 id="Item-java_列表数据">Item.java 列表数据</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Item</span> </span>&#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span> imgId;</span><br><span class="line">	<span class="keyword">private</span> String title;</span><br><span class="line">	<span class="keyword">private</span> String content;</span><br><span class="line">	···</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="ListActivity-java_列表界面">ListActivity.java 列表界面</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ListActivity</span> <span class="keyword">extends</span> <span class="title">Activity</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">boolean</span> useHolder;</span><br><span class="line">	<span class="keyword">private</span> ListView listView;</span><br><span class="line">	<span class="keyword">private</span> ArrayAdapter&lt;Item&gt; adapter;</span><br><span class="line">	<span class="keyword">private</span> List&lt;Item&gt; items;</span><br><span class="line"></span><br><span class="line">	<span class="annotation">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">		setContentView(R.layout.activity_list);</span><br><span class="line">		Intent intent = getIntent();</span><br><span class="line">		<span class="keyword">if</span> (intent != <span class="keyword">null</span>) &#123;</span><br><span class="line">			useHolder = intent.getBooleanExtra(<span class="string">"useHolder"</span>, <span class="keyword">false</span>);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">int</span> titleId = useHolder ? R.string.title_holder : R.string.title_noholder;</span><br><span class="line">		setTitle(titleId);</span><br><span class="line">		init();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		listView = (ListView) findViewById(R.id.listView);</span><br><span class="line">		initData(<span class="number">10000</span>);</span><br><span class="line">		<span class="keyword">if</span> (useHolder) &#123;</span><br><span class="line">			<span class="comment">// 跟踪holder模式</span></span><br><span class="line">			Debug.startMethodTracing(<span class="string">"holder"</span> + System.currentTimeMillis());</span><br><span class="line">			adapter = <span class="keyword">new</span> HolderAdapter(<span class="keyword">this</span>, items);</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			<span class="comment">// 跟踪noholder模式</span></span><br><span class="line">			Debug.startMethodTracing(<span class="string">"noholder"</span> + System.currentTimeMillis());</span><br><span class="line">			adapter = <span class="keyword">new</span> NoHolderAdapter(<span class="keyword">this</span>, items);</span><br><span class="line">		&#125;</span><br><span class="line">		listView.setAdapter(adapter);</span><br><span class="line">		<span class="comment">// 延时1000，确保ListView加载好数据后，让ListView自动平滑滚到到最后一项</span></span><br><span class="line">		listView.postDelayed(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line"></span><br><span class="line">			<span class="annotation">@Override</span></span><br><span class="line">			<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">				listView.smoothScrollToPosition(items.size() - <span class="number">1</span>);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;, <span class="number">1000</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 初始化数据</span></span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">initData</span><span class="params">(<span class="keyword">int</span> num)</span> </span>&#123;</span><br><span class="line">		items = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; num; i++) &#123;</span><br><span class="line">			Item item = <span class="keyword">new</span> Item();</span><br><span class="line">			item.setImgId(i % <span class="number">2</span> == <span class="number">0</span> ? R.drawable.img_doge : R.drawable.img_cat);</span><br><span class="line">			item.setTitle(<span class="string">"Title No."</span> + i);</span><br><span class="line">			item.setContent(<span class="string">"The content of No."</span> + i);</span><br><span class="line">			items.add(item);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="annotation">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onStop</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">super</span>.onStop();</span><br><span class="line">		Debug.stopMethodTracing();<span class="comment">// 退出窗口时结束跟踪</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>创建adapter时，开始记录跟踪信息，ListView设置adapter后延迟1秒，<br>使用<code>smoothScrollToPosition(items.size() - 1)</code>方法，自动平滑滚动列表到最后一项，<br>等待滚动结束后，退出列表界面，结束记录跟踪信息。</p>
+<h3 id="ViewHolder模式">ViewHolder模式</h3><h4 id="HolderAdapter-java_holder模式用的adapter">HolderAdapter.java holder模式用的adapter</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HolderAdapter</span> <span class="keyword">extends</span> <span class="title">ArrayAdapter</span>&lt;<span class="title">Item</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">HolderAdapter</span><span class="params">(Context context, List&lt;Item&gt; objects)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">super</span>(context, <span class="number">0</span>, objects);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="annotation">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> View <span class="title">getView</span><span class="params">(<span class="keyword">int</span> position, View convertView, ViewGroup parent)</span> </span>&#123;</span><br><span class="line">		ViewHolder holder = <span class="keyword">null</span>;</span><br><span class="line">		<span class="keyword">if</span> (convertView == <span class="keyword">null</span>) &#123;</span><br><span class="line">			convertView = LayoutInflater.from(parent.getContext()).inflate(</span><br><span class="line">					R.layout.item_holder, parent, <span class="keyword">false</span>);</span><br><span class="line">			holder = <span class="keyword">new</span> ViewHolder();</span><br><span class="line">			holder.ivImage = (ImageView) convertView.findViewById(R.id.iv_image);</span><br><span class="line">			holder.tvTitle = (TextView) convertView.findViewById(R.id.tv_title);</span><br><span class="line">			holder.tvContent = (TextView) convertView.findViewById(R.id.tv_content);</span><br><span class="line">			convertView.setTag(holder);</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			holder = (ViewHolder) convertView.getTag();</span><br><span class="line">		&#125;</span><br><span class="line">		Item item = getItem(position);</span><br><span class="line">		holder.ivImage.setImageResource(item.getImgId());</span><br><span class="line">		holder.tvTitle.setText(item.getTitle());</span><br><span class="line">		holder.tvContent.setText(item.getContent());</span><br><span class="line">		<span class="keyword">return</span> convertView;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">ViewHolder</span> </span>&#123;</span><br><span class="line">		<span class="keyword">public</span> ImageView ivImage;</span><br><span class="line">		<span class="keyword">public</span> TextView tvTitle;</span><br><span class="line">		<span class="keyword">public</span> TextView tvContent;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="item_holder-xml_holder模式用的item布局">item_holder.xml holder模式用的item布局</h4><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="pi">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">RelativeLayout</span> <span class="attribute">xmlns:android</span>=<span class="value">"http://schemas.android.com/apk/res/android"</span></span><br><span class="line">    <span class="attribute">android:layout_width</span>=<span class="value">"match_parent"</span></span><br><span class="line">    <span class="attribute">android:layout_height</span>=<span class="value">"64dp"</span></span><br><span class="line">    <span class="attribute">android:padding</span>=<span class="value">"8dp"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="title">ImageView</span></span><br><span class="line">        ··· /&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="title">TextView</span></span><br><span class="line">        ··· /&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="title">TextView</span></span><br><span class="line">        ··· /&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="title">RelativeLayout</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="No-ViewHolder模式">No-ViewHolder模式</h3><h4 id="ItemView-java_noholder模式用的item_view">ItemView.java noholder模式用的item view</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ItemView</span> <span class="keyword">extends</span> <span class="title">RelativeLayout</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> ImageView ivImage;</span><br><span class="line">	<span class="keyword">public</span> TextView tvTitle;</span><br><span class="line">	<span class="keyword">public</span> TextView tvContent;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">ItemView</span><span class="params">(Context context, AttributeSet attrs)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">super</span>(context, attrs);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 填充xml初始化ItemView,并获取子View引用</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> ItemView <span class="title">newInstance</span><span class="params">(ViewGroup parent)</span> </span>&#123;</span><br><span class="line">		ItemView view = (ItemView) LayoutInflater.from(parent.getContext())</span><br><span class="line">				.inflate(R.layout.item_view, parent, <span class="keyword">false</span>);</span><br><span class="line">		view.ivImage = (ImageView) view.findViewById(R.id.iv_image);</span><br><span class="line">		view.tvTitle = (TextView) view.findViewById(R.id.tv_title);</span><br><span class="line">		view.tvContent = (TextView) view.findViewById(R.id.tv_content);</span><br><span class="line">		<span class="keyword">return</span> view;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>相比上一篇文章的ItemView，这里为了减少方法嵌套，把各个子View成员声明为public，在adatper中会直接修改这些子View的属性，而不是通过在ItemView中封装方法进行修改。</p>
+<h4 id="NoHolderAdapter-java_noholder模式用的adapter">NoHolderAdapter.java noholder模式用的adapter</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NoHolderAdapter</span> <span class="keyword">extends</span> <span class="title">ArrayAdapter</span>&lt;<span class="title">Item</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">NoHolderAdapter</span><span class="params">(Context context, List&lt;Item&gt; objects)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">super</span>(context, <span class="number">0</span>, objects);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="annotation">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> View <span class="title">getView</span><span class="params">(<span class="keyword">int</span> position, View convertView, ViewGroup parent)</span> </span>&#123;</span><br><span class="line">		ItemView view = (ItemView) convertView;</span><br><span class="line">		<span class="keyword">if</span> (view == <span class="keyword">null</span>) &#123;</span><br><span class="line">			view = ItemView.newInstance(parent);</span><br><span class="line">		&#125;</span><br><span class="line">		Item item = getItem(position);</span><br><span class="line">		view.ivImage.setImageResource(item.getImgId());</span><br><span class="line">		view.tvTitle.setText(item.getTitle());</span><br><span class="line">		view.tvContent.setText(item.getContent());</span><br><span class="line">		<span class="keyword">return</span> view;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里没有调用上篇文章封装的<code>ItemView.populateData()</code>方法来修改各个item视图的内容，而是直接修改view暴露出来的各个子View成员，目的是为了减少方法嵌套调用，最大限度地与holder模式的代码保持一致。</p>
+<h4 id="item_view-xml_noholder模式用的item布局">item_view.xml noholder模式用的item布局</h4><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="pi">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">com.licheetec.noholderlistviewdemo.ItemView</span> <span class="attribute">xmlns:android</span>=<span class="value">"http://schemas.android.com/apk/res/android"</span></span><br><span class="line">    <span class="attribute">android:layout_width</span>=<span class="value">"match_parent"</span></span><br><span class="line">    <span class="attribute">android:layout_height</span>=<span class="value">"64dp"</span></span><br><span class="line">    <span class="attribute">android:padding</span>=<span class="value">"8dp"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="title">ImageView</span></span><br><span class="line">        ··· /&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="title">TextView</span></span><br><span class="line">        ··· /&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="title">TextView</span></span><br><span class="line">        ··· /&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="title">com.licheetec.noholderlistviewdemo.ItemView</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>除了根节点不同，其他跟holder模式的一样（别吐槽什么代码复用，懒得搞这么多，直接复制改名，更酸爽）。</p>
+<h2 id="测试结果分析">测试结果分析</h2><p>经过一轮蛋疼的等待，终于跑完了，2*5共10个trace文件<br><img src="http://i3.tietuku.com/97e4113d7912b7a9.jpg" alt="TraceView文件"><br>用sdk附带的<code>Android Device Monitor</code>工具（在<code>&lt;sdk&gt;/tools/monitor.bat</code>）打开，如图<br><img src="http://i2.tietuku.com/077e4678db3c1c8f.jpg" alt="monitor"><br>TraceView视图上面参数很多，具体参数意义可以参考这篇文章</p>
+<blockquote>
+<p><a href="http://blog.csdn.net/wwj_748/article/details/8913862" target="_blank" rel="external">http://blog.csdn.net/wwj_748/article/details/8913862</a></p>
+</blockquote>
+<p>针对这次测试，我们需要测量adapter的getView()方法的耗时，主要关注下列参数</p>
+<blockquote>
+<p>Incl Cpu Time：方法执行的总时间（包括调用子函数所消耗的时间）<br>Incl Real Time：方法真正被执行的时间。<br>Cpu Time/Call：方法每次被执行的时间<br>Real Time/Call：方法真实被执行的时间</p>
+</blockquote>
+<h3 id="ViewHolder模式测试结果">ViewHolder模式测试结果</h3><p><img src="http://i3.tietuku.com/d7d06abeb2dbf013.jpg" alt="holder1"><br><img src="http://i3.tietuku.com/aaa42cf4ecbe22ad.jpg" alt="holder2"><br><img src="http://i3.tietuku.com/4f54a274ad1808a2.jpg" alt="holder3"><br><img src="http://i3.tietuku.com/880b522001c427e6.jpg" alt="holder4"><br><img src="http://i3.tietuku.com/828ca42ee0e42b0f.jpg" alt="holder5"></p>
+<h3 id="No-ViewHolder模式测试结果">No-ViewHolder模式测试结果</h3><p><img src="http://i2.tietuku.com/36f9ee1c7833253d.jpg" alt="noholder1"><br><img src="http://i2.tietuku.com/32e98609e8b3217a.jpg" alt="noholder2"><br><img src="http://i2.tietuku.com/3114fec3d43db865.jpg" alt="noholder3"><br><img src="http://i2.tietuku.com/79250fc9b950b529.jpg" alt="noholder4"><br><img src="http://i2.tietuku.com/aec7de757b40c243.jpg" alt="noholder5"></p>
+<h3 id="汇总">汇总</h3><p><img src="http://i3.tietuku.com/a1d28c640e0c2a18.jpg" alt="汇总"><br>第一次运行的时候的数据比较特殊，其他就比较平均，因为我们无法确定CPU到底怎么分配资源，所以每次数据都会有波动，那么求平均数也没意义。<br>两种模式都各有输赢，不过差别不大，无法确定到底哪一种更优。</p>
+<h2 id="总结">总结</h2><p>测试结束，说实话，比较郁闷，实在没法确定哪种模式更优。两种模式的代码，只有在创建ItemView或ViewHolder对象的时候有所不同，而因为要复用convertView对象的关系，就算我们刷了100W个数据，创建ItemView或者ViewHolder的个数，顶多也就同一时间屏幕能显示的列表项目的个数，后面的直接复用convertView，就不存在什么性能上的差别。<br>不过还是能得出一个结论，就是<strong>NoViewHolder模式的性能并不比ViewHolder模式低</strong>，<br>而由于不用重复调用setTag()和getTag()的关系，性能可能更好。<br>当然，前提是减少方法嵌套，不过这样就有点破坏封装性，鱼与熊掌不能兼得，反正具体问题具体分析，看情况用呗。</p>
+
+      
+    </div>
+    <footer>
+      
+      
+<section id="nav">
+  <div class="post-nav">
+    <div class="post-nav-prev">
+      
+        <a href="/2015/04/18/learn-python-1/"><< 前一篇</a>
+      
+    </div>
+
+    <div class="post-nav-next">
+      
+        <a href="/2015/03/21/no-viewholder-listview/">后一篇 >></a>
+      
+    </div>
+  </div>
+</section>
+
+        
+  
+  <div class="categories">
+    <a href="/categories/Android/">Android</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/ListView/">ListView</a>, <a href="/tags/ViewHolder/">ViewHolder</a>
+  </div>
+
+        
+      
+      <div class="clearfix"></div>
+    </footer>
+
+  </div>
+</article>
+
+<section id="comment">
+  <h1 class="title">评论</h1>
+
+    <div class="ds-thread" data-thread-key="2015/03/23/no-viewholder-listview-performance/" data-title="ViewHolder模式&无ViewHolder模式ListView性能对比" data-url="http://licheedev.com/2015/03/23/no-viewholder-listview-performance/"></div>
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"licheedev"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.unstable.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+  </section>
+  
+
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"1","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"16"},"slide":{"type":"slide","bdImg":"3","bdPos":"right","bdTop":"100"}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+
+</div></div>
+    <aside id="sidebar" class="alignright">
+  <div class="search">
+  <form action="//google.com/search" method="get" accept-charset="utf-8">
+    <input type="search" name="q" results="0" placeholder="Google本站">
+    <input type="hidden" name="q" value="site:licheedev.com">
+  </form>
+</div>
+
+  
+<div class="widget social">
+  <h3 class="title">联系</h3>
+  <ul class="my-socials">
+    
+    <li>
+  	  <a href="https://github.com/licheedev" class="github" target="_blank">
+  		  <i class="fa fa-github"></i>
+  	  </a>
+    </li>
+    
+    <li>
+  	  <a href="http://weibo.com/licheedev" class="weibo" target="_blank">
+  		  <i class="fa fa-weibo"></i>
+  	  </a>
+    </li>
+    
+    
+    <li>
+   	  <a href="mailto:licheedev@foxmail.com" class="email" target="_blank" title="Email Me">
+  		 <i class="fa fa-envelope"></i>
+  	  </a>
+    </li>
+    
+  </ul>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">目录</h3>
+  <ul class="entry">
+  
+    <li><a href="/categories/Android/">Android</a><small>10</small></li>
+  
+    <li><a href="/categories/python/">python</a><small>1</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tagcloud">
+  <h3 class="title">标签云</h3>
+  <div class="entry">
+    <a href="/tags/Android/" style="font-size: 10px;">Android</a> <a href="/tags/Android-Studio/" style="font-size: 15px;">Android Studio</a> <a href="/tags/Glide/" style="font-size: 10px;">Glide</a> <a href="/tags/Gradle/" style="font-size: 20px;">Gradle</a> <a href="/tags/ImageView/" style="font-size: 10px;">ImageView</a> <a href="/tags/ListView/" style="font-size: 15px;">ListView</a> <a href="/tags/ViewHolder/" style="font-size: 15px;">ViewHolder</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/scaleType/" style="font-size: 10px;">scaleType</a> <a href="/tags/volley/" style="font-size: 10px;">volley</a>
+  </div>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">最近文章</h3>
+  <ul class="entry">
+    
+      <li>
+        <a href="/2015/06/22/gradle-proxy-for-as-1-3/">Android Studio（1.3版本）设置Gradle代理的正确姿势</a>
+      </li>
+    
+      <li>
+        <a href="/2015/05/23/android-multi-dex/">使用Multidex解决App方法数超过65536限制问题</a>
+      </li>
+    
+      <li>
+        <a href="/2015/05/21/android-best-practices/">【转载】Android 开发最佳实践</a>
+      </li>
+    
+      <li>
+        <a href="/2015/05/20/manifest-merger-failed/">解决Android Studio添加依赖时出现“Manifest merger failed”</a>
+      </li>
+    
+      <li>
+        <a href="/2015/05/16/imageview-scale-type/">ImageView的scaleType设置不当，导致使用Glide时出现OOM</a>
+      </li>
+    
+  </ul>
+</div>
+
+</aside>
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><div class="alignleft">
+  
+  &copy; 2015 John Lee
+  . 
+  Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> 
+  Theme by <a href="https://github.com/licheedev/hexo-theme-lightgreen" target="_blank">LightGreen</a> .
+              <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+            <span id="busuanzi_container_site_pv">本站总访问量 <a href="http://service.ibruce.info/" target="_blank"><span id="busuanzi_value_site_pv"></span></a> 次</span>
+</div>
+<div class="clearfix"></div></footer>
+  <script src="/js/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+<div id="totop" style="position:fixed;bottom:50px;right:50px;cursor: pointer;">
+<a title="返回顶部"><img src="/imgs/scrollup.png"/></a>
+</div>
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?c1a996e9a88b120ebf33af09f6dcc6ca";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+<script src="/js/totop.js"></script>
+</body>
+</html>

@@ -1,0 +1,327 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Android Studio（1.3版本）设置Gradle代理的正确姿势 | LicheeDev-某黎的博客</title>
+  <meta name="author" content="John Lee">
+  
+  <meta name="description" content="黎某人的博客。乱七八糟都记点。">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Android Studio（1.3版本）设置Gradle代理的正确姿势"/>
+  <meta property="og:site_name" content="LicheeDev-某黎的博客"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  <link href="/favicon.png" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="LicheeDev-某黎的博客" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.css" rel="stylesheet">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+<script>
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+	ga('create', 'UA-64082407-1', 'auto');
+	ga('send', 'pageview');
+
+</script>
+
+
+</head>
+
+
+<body>
+  <header id="header" class="inner"><div class="alignleft">
+  <h1><a href="/">LicheeDev-某黎的博客</a></h1>
+  <h2><a href="/">写博客的时候，我会假装四处看风景</a></h2>
+</div>
+<nav id="main-nav" class="alignright">
+  <ul>
+    
+      <li><a href="/">首页</a></li>
+    
+      <li><a href="/archives">归档</a></li>
+    
+      <li><a href="/about">关于</a></li>
+    
+      <li><a href="/atom.xml">订阅鄙站</a></li>
+    
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+<div class="clearfix"></div></header>
+  <div id="content" class="inner">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2015-06-22T14:01:50.000Z"><a href="/2015/06/22/gradle-proxy-for-as-1-3/">2015-06-22</a></time>
+      
+      
+  
+    <h1 class="title">Android Studio（1.3版本）设置Gradle代理的正确姿势</h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <h1 id="遭遇">遭遇</h1><p>手贱把自己电脑的Android Studio升级到最新的1.3 Preview。<br>然后上星期帮朋友配置Robolectric，要各种下载依赖，结果速度慢得要死。<br>检查了一下网络连接，囧了，发现没走梯子(shadowsocks没速度)，直连了，如下图：</p>
+<p><img src="http://i1.tietuku.com/9a444c33d040beee.png" alt="没走代理走直连"><br><a id="more"></a></p>
+<h1 id="测试">测试</h1><p>好吧，于是切换了各种代理姿势：</p>
+<ol>
+<li><p>基本的HTTP Proxy设置</p>
+<p><img src="http://i4.tietuku.com/e749fd31c22907a5.jpg" alt="基本的HTTP Proxy设置"></p>
+<p>一开始就设置代理到shadowsocks，不过<code>无效</code></p>
+</li>
+<li><p>设置编译参数</p>
+<p><img src="http://i4.tietuku.com/6664b475570d604d.jpg" alt="编译参数"></p>
+<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-Dhttp.<span class="variable">proxyHost=</span><span class="number">127.0</span>.<span class="number">0.1</span> -Dhttp.<span class="variable">proxyPort=</span><span class="number">8123</span> -Dhttps.<span class="variable">proxyHost=</span><span class="number">127.0</span>.<span class="number">0.1</span> -Dhttps.<span class="variable">proxyPort=</span><span class="number">8123</span></span><br></pre></td></tr></table></figure>
+<p>然而并没有什么卵用。</p>
+</li>
+<li><p>设置GRADLE_OPTS环境变量</p>
+<p>跟上面的差不多，新建环境变量<code>GRADLE_OPTS</code>，值为以下，不过还是<code>无效</code></p>
+<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-Dhttp.<span class="variable">proxyHost=</span><span class="number">127.0</span>.<span class="number">0.1</span> -Dhttp.<span class="variable">proxyPort=</span><span class="number">8123</span> -Dhttps.<span class="variable">proxyHost=</span><span class="number">127.0</span>.<span class="number">0.1</span> -Dhttps.<span class="variable">proxyPort=</span><span class="number">8123</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>按照Android Studio的烦人提示，往<code>gradle.properties</code>文件中添加代理配置<br>如果使用了AS1.3版本，并按照1那样设置了代理，就一定会弹出下面这个烦人的提示（最近两次更新已经提供了闭嘴选项，左下角那里）</p>
+<p><img src="http://i4.tietuku.com/11dcd0b7ebd01522.jpg" alt="Proxy Settings提示"></p>
+<p>选了Yes的结果就是，项目的<code>gradle.properties</code>文件中会多了两句（跟1中的设置对应）：</p>
+<p><img src="http://i4.tietuku.com/c8a85c448bddff8c.jpg" alt="具体配置"></p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">systemProp<span class="class">.http</span><span class="class">.proxyHost</span>=<span class="number">127.0</span>.<span class="number">0.1</span></span><br><span class="line">systemProp<span class="class">.http</span><span class="class">.proxyPort</span>=<span class="number">8123</span></span><br></pre></td></tr></table></figure>
+<p>然并卵，还是坑。</p>
+<blockquote>
+<p>P.S. 如果不小心让这玩意闭嘴了，又舍不得，可以通过修改下列参数再次打开，具体文件位置请自行搜索。<br><img src="http://i4.tietuku.com/a8f15efd90d8f5a1.jpg" alt="不要闭嘴"></p>
+</blockquote>
+</li>
+</ol>
+<h1 id="解决">解决</h1><p>不得不说，Gogole太能玩开发者，自己提供的解决方案，竟然不能用，有考虑过我们这些苦逼的中国开发者的感受么。</p>
+<p>好吧，先搜搜看，就用<code>android studio 1.3 proxy</code>做关键词，别用百度，</p>
+<p>然后看我找到了什么：</p>
+<blockquote>
+<p><a href="https://code.google.com/p/android/issues/detail?id=176296" target="_blank" rel="external">https://code.google.com/p/android/issues/detail?id=176296</a></p>
+<p>Android Studio sets automatically the proxy settings for gradle in gradle.properties.</p>
+<p>You should add the proxy-Settings for https, not only for http:</p>
+<p>systemProp.https.proxyHost=<ip><br>systemProp.https.proxyPort=<port></port></ip></p>
+<p>Reproducable in Android Studio 1.3 (AI-141.1989493) (RC3?)</p>
+</blockquote>
+<p>试试看，往项目的<code>gradle.properties</code>里面多加两句</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">systemProp<span class="class">.https</span><span class="class">.proxyHost</span>=<span class="number">127.0</span>.<span class="number">0.1</span></span><br><span class="line">systemProp<span class="class">.https</span><span class="class">.proxyPort</span>=<span class="number">8123</span></span><br></pre></td></tr></table></figure>
+<p>经检验，成功启动代理，麻麻再也不用担心被墙了。</p>
+<p><img src="http://i1.tietuku.com/3119df3d8616cd69.jpg" alt="成功代理"></p>
+<h1 id="总结">总结</h1><p>其实我在1.2版本之前，本人就试过按照上文那样，在gradle.properties里面设置过代理，但是那时候只要加了那几句配置了，AS就会提示找不到依赖，那时候排查了很久，才发现是那里的问题。<br><code>如果是AS1.2或以前，只要在HTTP Proxy那里设置代理，就能很好地运作.</code><br>不过到了AS1.3，情况完全相反，不设置还不行。搞不明白Google修改这个的动机是啥。</p>
+<p>虽然找到了方法，不过每个项目的改一下太麻烦了，而且代理什么的因人而异，如果项目开源了，别人很有可能不需要设置代理，或者使用的是别的代理，这样修改无异于画蛇添足。</p>
+<p>其实Gralde还提供全局<code>gradle.properties</code>方案，参考这里：</p>
+<blockquote>
+<p><a href="https://docs.gradle.org/current/userguide/build_environment.html" target="_blank" rel="external">https://docs.gradle.org/current/userguide/build_environment.html</a></p>
+</blockquote>
+<p><code>Gradle user home</code>是存放依赖库，还有默认gradle参数的地方，默认在这些文件夹</p>
+<blockquote>
+<p>/home/<username>/.gradle/ (Linux)<br>/Users/<username>/.gradle/ (Mac)<br>C:\Users\<username>.gradle (Windows)</username></username></username></p>
+</blockquote>
+<p>当然，也能通过环境变量<code>GRADLE_USER_HOME</code>来指定，<br>在<code>Gradle user home</code>文件夹下建立<code>gradle.properties</code>文件，然后加上代理的配置即可，如下图</p>
+<p><img src="http://i4.tietuku.com/821d27b7df55d1be.jpg" alt="全局代理"></p>
+<p>这样就完成了全局代理的配置。</p>
+<p>附上完整的可选代理配置：</p>
+<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># http</span></span><br><span class="line">systemProp.<span class="keyword">http</span>.proxyHost=www.somehost.org</span><br><span class="line">systemProp.<span class="keyword">http</span>.proxyPort=<span class="number">8080</span></span><br><span class="line">systemProp.<span class="keyword">http</span>.proxyUser=userid</span><br><span class="line">systemProp.<span class="keyword">http</span>.proxyPassword=password</span><br><span class="line">systemProp.<span class="keyword">http</span>.nonProxyHosts=*.nonproxyrepos.com|localhost</span><br><span class="line"><span class="comment"># https</span></span><br><span class="line">systemProp.<span class="keyword">https</span>.proxyHost=www.somehost.org</span><br><span class="line">systemProp.<span class="keyword">https</span>.proxyPort=<span class="number">8080</span></span><br><span class="line">systemProp.<span class="keyword">https</span>.proxyUser=userid</span><br><span class="line">systemProp.<span class="keyword">https</span>.proxyPassword=password</span><br><span class="line">systemProp.<span class="keyword">https</span>.nonProxyHosts=*.nonproxyrepos.com|localhost</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    <footer>
+      
+      
+<section id="nav">
+  <div class="post-nav">
+    <div class="post-nav-prev">
+      
+    </div>
+
+    <div class="post-nav-next">
+      
+        <a href="/2015/05/23/android-multi-dex/">后一篇 >></a>
+      
+    </div>
+  </div>
+</section>
+
+        
+  
+  <div class="categories">
+    <a href="/categories/Android/">Android</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/Gradle/">Gradle</a>
+  </div>
+
+        
+      
+      <div class="clearfix"></div>
+    </footer>
+
+  </div>
+</article>
+
+<section id="comment">
+  <h1 class="title">评论</h1>
+
+    <div class="ds-thread" data-thread-key="2015/06/22/gradle-proxy-for-as-1-3/" data-title="Android Studio（1.3版本）设置Gradle代理的正确姿势" data-url="http://licheedev.com/2015/06/22/gradle-proxy-for-as-1-3/"></div>
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"licheedev"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.unstable.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+  </section>
+  
+
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"1","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"16"},"slide":{"type":"slide","bdImg":"3","bdPos":"right","bdTop":"100"}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+
+</div></div>
+    <aside id="sidebar" class="alignright">
+  <div class="search">
+  <form action="//google.com/search" method="get" accept-charset="utf-8">
+    <input type="search" name="q" results="0" placeholder="Google本站">
+    <input type="hidden" name="q" value="site:licheedev.com">
+  </form>
+</div>
+
+  
+<div class="widget social">
+  <h3 class="title">联系</h3>
+  <ul class="my-socials">
+    
+    <li>
+  	  <a href="https://github.com/licheedev" class="github" target="_blank">
+  		  <i class="fa fa-github"></i>
+  	  </a>
+    </li>
+    
+    <li>
+  	  <a href="http://weibo.com/licheedev" class="weibo" target="_blank">
+  		  <i class="fa fa-weibo"></i>
+  	  </a>
+    </li>
+    
+    
+    <li>
+   	  <a href="mailto:licheedev@foxmail.com" class="email" target="_blank" title="Email Me">
+  		 <i class="fa fa-envelope"></i>
+  	  </a>
+    </li>
+    
+  </ul>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">目录</h3>
+  <ul class="entry">
+  
+    <li><a href="/categories/Android/">Android</a><small>10</small></li>
+  
+    <li><a href="/categories/python/">python</a><small>1</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tagcloud">
+  <h3 class="title">标签云</h3>
+  <div class="entry">
+    <a href="/tags/Android/" style="font-size: 10px;">Android</a> <a href="/tags/Android-Studio/" style="font-size: 15px;">Android Studio</a> <a href="/tags/Glide/" style="font-size: 10px;">Glide</a> <a href="/tags/Gradle/" style="font-size: 20px;">Gradle</a> <a href="/tags/ImageView/" style="font-size: 10px;">ImageView</a> <a href="/tags/ListView/" style="font-size: 15px;">ListView</a> <a href="/tags/ViewHolder/" style="font-size: 15px;">ViewHolder</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/scaleType/" style="font-size: 10px;">scaleType</a> <a href="/tags/volley/" style="font-size: 10px;">volley</a>
+  </div>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">最近文章</h3>
+  <ul class="entry">
+    
+      <li>
+        <a href="/2015/06/22/gradle-proxy-for-as-1-3/">Android Studio（1.3版本）设置Gradle代理的正确姿势</a>
+      </li>
+    
+      <li>
+        <a href="/2015/05/23/android-multi-dex/">使用Multidex解决App方法数超过65536限制问题</a>
+      </li>
+    
+      <li>
+        <a href="/2015/05/21/android-best-practices/">【转载】Android 开发最佳实践</a>
+      </li>
+    
+      <li>
+        <a href="/2015/05/20/manifest-merger-failed/">解决Android Studio添加依赖时出现“Manifest merger failed”</a>
+      </li>
+    
+      <li>
+        <a href="/2015/05/16/imageview-scale-type/">ImageView的scaleType设置不当，导致使用Glide时出现OOM</a>
+      </li>
+    
+  </ul>
+</div>
+
+</aside>
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><div class="alignleft">
+  
+  &copy; 2015 John Lee
+  . 
+  Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> 
+  Theme by <a href="https://github.com/licheedev/hexo-theme-lightgreen" target="_blank">LightGreen</a> .
+              <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+            <span id="busuanzi_container_site_pv">本站总访问量 <a href="http://service.ibruce.info/" target="_blank"><span id="busuanzi_value_site_pv"></span></a> 次</span>
+</div>
+<div class="clearfix"></div></footer>
+  <script src="/js/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+<div id="totop" style="position:fixed;bottom:50px;right:50px;cursor: pointer;">
+<a title="返回顶部"><img src="/imgs/scrollup.png"/></a>
+</div>
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?c1a996e9a88b120ebf33af09f6dcc6ca";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+<script src="/js/totop.js"></script>
+</body>
+</html>

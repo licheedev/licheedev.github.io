@@ -1,0 +1,304 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>摆脱ViewHolder，一种无需ViewHolder的高效ListView写法 | LicheeDev-某黎的博客</title>
+  <meta name="author" content="John Lee">
+  
+  <meta name="description" content="黎某人的博客。乱七八糟都记点。">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="摆脱ViewHolder，一种无需ViewHolder的高效ListView写法"/>
+  <meta property="og:site_name" content="LicheeDev-某黎的博客"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  <link href="/favicon.png" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="LicheeDev-某黎的博客" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.css" rel="stylesheet">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+<script>
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+	ga('create', 'UA-64082407-1', 'auto');
+	ga('send', 'pageview');
+
+</script>
+
+
+</head>
+
+
+<body>
+  <header id="header" class="inner"><div class="alignleft">
+  <h1><a href="/">LicheeDev-某黎的博客</a></h1>
+  <h2><a href="/">写博客的时候，我会假装四处看风景</a></h2>
+</div>
+<nav id="main-nav" class="alignright">
+  <ul>
+    
+      <li><a href="/">首页</a></li>
+    
+      <li><a href="/archives">归档</a></li>
+    
+      <li><a href="/about">关于</a></li>
+    
+      <li><a href="/atom.xml">订阅鄙站</a></li>
+    
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+<div class="clearfix"></div></header>
+  <div id="content" class="inner">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2015-03-21T14:17:14.000Z"><a href="/2015/03/21/no-viewholder-listview/">2015-03-21</a></time>
+      
+      
+  
+    <h1 class="title">摆脱ViewHolder，一种无需ViewHolder的高效ListView写法</h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <p>使用ListView来展示列表数据，基本上是每个Android猿必须掌握的技能，而ListView的基本优化技巧，基本也烂大街了，无非是复用convertView对象还有使用ViewHolder来缓存Item中各个子View的引用。<br>最近看到一篇文章，描述了一种非主流的高效的ListView写法，无需创建ViewHolder类和holder对象，不用setTag()和getTag()，感觉效率更高。</p>
+<p>原文见</p>
+<blockquote>
+<p><a href="http://www.bignerdranch.com/blog/customizing-android-listview-rows-subclassing/" target="_blank" rel="external">http://www.bignerdranch.com/blog/customizing-android-listview-rows-subclassing/</a></p>
+</blockquote>
+<p>原文作者通过创建RelativeLayout子类（这里ListView各item的布局的根布局是RelativeLayout，根据实际情况而定）来封装所有自定义操作，如findViewById各个子View，填充数据等。<br><a id="more"></a></p>
+<h3 id="原文作者不喜欢ViewHolder的原因">原文作者不喜欢ViewHolder的原因</h3><ul>
+<li>ViewHolder模式会在Adapter的getView(…)方法中干了太多事。</li>
+<li>ViewHolder类太过公式化，创建和设置holder让人累觉不爱。</li>
+<li>View.getTag()得到的对象需要强转为正确的holder类型，坑（查不到kludgy的翻译，只能这样了，坑）。</li>
+<li>因为adapter/holder需要知道代表列表各项的view的内部结构，有违封装性。</li>
+</ul>
+<h3 id="无需ViewHolder的写法">无需ViewHolder的写法</h3><p>出于复用布局的目的，原文作者定义了两个布局文件和使用merge标签来描述item的view，不过我觉得这不是这个写法的重点，所以改了一下，只是简单地定义了一个布局文件来描述item view。<br>先看看Demo截图<br><img src="http://i3.tietuku.com/91ae7225d6e088c8.jpg" alt="截图"></p>
+<h4 id="完整代码猛戳_这里">完整代码猛戳 <a href="https://github.com/licheedev/NoHolderListViewDemo" target="_blank" rel="external"><strong>这里</strong></a></h4><p><strong>1.</strong> 定义一个<code>Item</code>类来定义列表数据。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Item</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> imgId;</span><br><span class="line">    <span class="keyword">private</span> String title;</span><br><span class="line">    <span class="keyword">private</span> String content;</span><br><span class="line">    ...getter...setter...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>2.</strong> 定义item view的布局（见<a href="https://github.com/licheedev/NoHolderListViewDemo/blob/master/NoHolderListViewDemo/app/src/main/res/layout/item_view.xml" target="_blank" rel="external"><code>item_view.xml</code></a>）。<br><strong>3.</strong> 自定义<code>ItemView</code>类，继承<code>步骤2</code>中定义的布局的根布局（这里是<code>RelativeLayout</code>），实现参数为<code>(Context context, AttributeSet attrs)</code>或<code>(Context context, AttributeSet attrs, int defStyle)</code>的构造方法，并添加用于获取子View对象引用、获取ItemView对象和填充数据的方法，具体代码如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ItemView</span> <span class="keyword">extends</span> <span class="title">RelativeLayout</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> ImageView ivImage;</span><br><span class="line">    <span class="keyword">private</span> TextView tvTitle;</span><br><span class="line">    <span class="keyword">private</span> TextView tvContent;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ItemView</span><span class="params">(Context context, AttributeSet attrs)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(context, attrs);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取ItemView</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> ItemView <span class="title">newInstance</span><span class="params">(ViewGroup parent)</span> </span>&#123;</span><br><span class="line">        ItemView view = (ItemView) LayoutInflater.from(parent.getContext()).inflate(R.layout.item_view,parent,<span class="keyword">false</span>);</span><br><span class="line">        view.setupChildren();</span><br><span class="line">        <span class="keyword">return</span> view;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取子View对象的引用</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">setupChildren</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        ivImage = (ImageView) findViewById(R.id.iv_image);</span><br><span class="line">        tvTitle = (TextView) findViewById(R.id.tv_title);</span><br><span class="line">        tvContent = (TextView) findViewById(R.id.tv_content);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 填充数据</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">populateData</span><span class="params">(Item item)</span> </span>&#123;</span><br><span class="line">        ivImage.setImageResource(item.getImgId());</span><br><span class="line">        tvTitle.setText(item.getTitle());</span><br><span class="line">        tvContent.setText(item.getContent());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>  需要注意的是，有网友反馈，说参照原文那样改写，出现异常</p>
+<blockquote>
+<p>03-22 10:11:09.340: E/AndroidRuntime(1417): android.view.InflateException: Binary XML file line #1: Error inflating class com.xxxx.ItemView<br>….<br>03-22 10:11:09.340: E/AndroidRuntime(1417): Caused by: java.lang.NoSuchMethodException: <init> [class android.content.Context, interface android.util.AttributeSet]</init></p>
+</blockquote>
+<p>  分析最后一个“Caused by”异常消息，应该是填充xml初始化ItemView的时候，<br>调用的是参数为<code>(Context context, AttributeSet attrs)</code>的构造方法，<br>而原文用的是参数为<code>(Context context, AttributeSet attrs, int defStyle)</code>的构造方法，如果按照原文那样写的话，就有可能出现这个找不到方法的异常，<br>只要按照log的提示，修改为需要的那种构造方法就好。</p>
+<p><strong>4.</strong> 创建ListView用的adapter类（<code>ItemAdapter</code>）。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ItemAdapter</span> <span class="keyword">extends</span> <span class="title">ArrayAdapter</span>&lt;<span class="title">Item</span>&gt; </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ItemAdapter</span><span class="params">(Context context, List&lt;Item&gt; objects)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(context, <span class="number">0</span>, objects);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="annotation">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> View <span class="title">getView</span><span class="params">(<span class="keyword">int</span> position, View convertView, ViewGroup parent)</span> </span>&#123;</span><br><span class="line">        ItemView view = (ItemView) convertView;</span><br><span class="line">        <span class="keyword">if</span> (view == <span class="keyword">null</span>) &#123;</span><br><span class="line">            view = ItemView.newInstance(parent);</span><br><span class="line">        &#125;</span><br><span class="line">        view.populateData(getItem(position));</span><br><span class="line">        <span class="keyword">return</span> view;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>5.</strong> （<code>很重要，我经常会忘了这步</code>）把item view中布局（item_view.xml）的<code>根标签</code>，改为<code>ItemView</code>。<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="pi">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">com.licheetec.noholderlistviewdemo.ItemView</span> <span class="attribute">xmlns:android</span>=<span class="value">"http://schemas.android.com/apk/res/android"</span></span><br><span class="line">    <span class="attribute">android:layout_width</span>=<span class="value">"match_parent"</span></span><br><span class="line">    <span class="attribute">android:layout_height</span>=<span class="value">"64dp"</span></span><br><span class="line">    <span class="attribute">android:padding</span>=<span class="value">"8dp"</span>&gt;</span></span><br><span class="line">    </span><br><span class="line">    <span class="tag">&lt;<span class="title">ImageView</span></span><br><span class="line">        <span class="attribute">android:id</span>=<span class="value">"@+id/iv_image"</span></span><br><span class="line">       <span class="attribute">...</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="title">TextView</span></span><br><span class="line">        <span class="attribute">android:id</span>=<span class="value">"@+id/tv_title"</span></span><br><span class="line">        <span class="attribute">...</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="title">TextView</span></span><br><span class="line">        <span class="attribute">android:id</span>=<span class="value">"@+id/tv_content"</span></span><br><span class="line">        <span class="attribute">...</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">com.licheetec.noholderlistviewdemo.ItemView</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>6.</strong> 剩下的就是在activity获取和设置ListView了。</p>
+<h3 id="总结这种写法的优势">总结这种写法的优势</h3><ul>
+<li>Adapter的代码会变得极其简洁</li>
+<li>很容易通过代码和xml文件来创建ItemView</li>
+<li>以后有需要更改，只需要对布局文件和ItemView进行动刀即可</li>
+<li>整个过程无需创建额外的holder类和对象</li>
+</ul>
+<p>好了，基本就这样，转述可能跟原文有些出入，有能力的话可以看原文怎么说明的。</p>
+<blockquote>
+<p><strong>文章地址 <a href="http://www.licheedev.com/2015/03/21/no-viewholder-listview/" target="_blank" rel="external">http://www.licheedev.com/2015/03/21/no-viewholder-listview/</a> 转载请注明出处</strong></p>
+</blockquote>
+
+      
+    </div>
+    <footer>
+      
+      
+<section id="nav">
+  <div class="post-nav">
+    <div class="post-nav-prev">
+      
+        <a href="/2015/03/23/no-viewholder-listview-performance/"><< 前一篇</a>
+      
+    </div>
+
+    <div class="post-nav-next">
+      
+    </div>
+  </div>
+</section>
+
+        
+  
+  <div class="categories">
+    <a href="/categories/Android/">Android</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/ListView/">ListView</a>, <a href="/tags/ViewHolder/">ViewHolder</a>
+  </div>
+
+        
+      
+      <div class="clearfix"></div>
+    </footer>
+
+  </div>
+</article>
+
+<section id="comment">
+  <h1 class="title">评论</h1>
+
+    <div class="ds-thread" data-thread-key="2015/03/21/no-viewholder-listview/" data-title="摆脱ViewHolder，一种无需ViewHolder的高效ListView写法" data-url="http://licheedev.com/2015/03/21/no-viewholder-listview/"></div>
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"licheedev"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.unstable.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+  </section>
+  
+
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"1","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"16"},"slide":{"type":"slide","bdImg":"3","bdPos":"right","bdTop":"100"}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+
+</div></div>
+    <aside id="sidebar" class="alignright">
+  <div class="search">
+  <form action="//google.com/search" method="get" accept-charset="utf-8">
+    <input type="search" name="q" results="0" placeholder="Google本站">
+    <input type="hidden" name="q" value="site:licheedev.com">
+  </form>
+</div>
+
+  
+<div class="widget social">
+  <h3 class="title">联系</h3>
+  <ul class="my-socials">
+    
+    <li>
+  	  <a href="https://github.com/licheedev" class="github" target="_blank">
+  		  <i class="fa fa-github"></i>
+  	  </a>
+    </li>
+    
+    <li>
+  	  <a href="http://weibo.com/licheedev" class="weibo" target="_blank">
+  		  <i class="fa fa-weibo"></i>
+  	  </a>
+    </li>
+    
+    
+    <li>
+   	  <a href="mailto:licheedev@foxmail.com" class="email" target="_blank" title="Email Me">
+  		 <i class="fa fa-envelope"></i>
+  	  </a>
+    </li>
+    
+  </ul>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">目录</h3>
+  <ul class="entry">
+  
+    <li><a href="/categories/Android/">Android</a><small>10</small></li>
+  
+    <li><a href="/categories/python/">python</a><small>1</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tagcloud">
+  <h3 class="title">标签云</h3>
+  <div class="entry">
+    <a href="/tags/Android/" style="font-size: 10px;">Android</a> <a href="/tags/Android-Studio/" style="font-size: 15px;">Android Studio</a> <a href="/tags/Glide/" style="font-size: 10px;">Glide</a> <a href="/tags/Gradle/" style="font-size: 20px;">Gradle</a> <a href="/tags/ImageView/" style="font-size: 10px;">ImageView</a> <a href="/tags/ListView/" style="font-size: 15px;">ListView</a> <a href="/tags/ViewHolder/" style="font-size: 15px;">ViewHolder</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/scaleType/" style="font-size: 10px;">scaleType</a> <a href="/tags/volley/" style="font-size: 10px;">volley</a>
+  </div>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">最近文章</h3>
+  <ul class="entry">
+    
+      <li>
+        <a href="/2015/06/22/gradle-proxy-for-as-1-3/">Android Studio（1.3版本）设置Gradle代理的正确姿势</a>
+      </li>
+    
+      <li>
+        <a href="/2015/05/23/android-multi-dex/">使用Multidex解决App方法数超过65536限制问题</a>
+      </li>
+    
+      <li>
+        <a href="/2015/05/21/android-best-practices/">【转载】Android 开发最佳实践</a>
+      </li>
+    
+      <li>
+        <a href="/2015/05/20/manifest-merger-failed/">解决Android Studio添加依赖时出现“Manifest merger failed”</a>
+      </li>
+    
+      <li>
+        <a href="/2015/05/16/imageview-scale-type/">ImageView的scaleType设置不当，导致使用Glide时出现OOM</a>
+      </li>
+    
+  </ul>
+</div>
+
+</aside>
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><div class="alignleft">
+  
+  &copy; 2015 John Lee
+  . 
+  Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> 
+  Theme by <a href="https://github.com/licheedev/hexo-theme-lightgreen" target="_blank">LightGreen</a> .
+              <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+            <span id="busuanzi_container_site_pv">本站总访问量 <a href="http://service.ibruce.info/" target="_blank"><span id="busuanzi_value_site_pv"></span></a> 次</span>
+</div>
+<div class="clearfix"></div></footer>
+  <script src="/js/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+<div id="totop" style="position:fixed;bottom:50px;right:50px;cursor: pointer;">
+<a title="返回顶部"><img src="/imgs/scrollup.png"/></a>
+</div>
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?c1a996e9a88b120ebf33af09f6dcc6ca";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+<script src="/js/totop.js"></script>
+</body>
+</html>
