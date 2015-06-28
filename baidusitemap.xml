@@ -7,7 +7,7 @@
     <lastmod>2015-06-27T08:09:16.237Z</lastmod>
     <data>
         <display>
-        <title>Android Studio（1.3版本）设置Gradle代理的正确姿势</title>
+        <title><![CDATA[Android Studio（1.3版本）设置Gradle代理的正确姿势]]></title>
         <pubTime>2015-06-22T14:01:50.000Z</pubTime>
         
         <tag>Gradle </tag>
@@ -27,7 +27,7 @@
     <lastmod>2015-06-22T16:33:10.845Z</lastmod>
     <data>
         <display>
-        <title>使用Multidex解决App方法数超过65536限制问题</title>
+        <title><![CDATA[使用Multidex解决App方法数超过65536限制问题]]></title>
         <pubTime>2015-05-23T15:54:35.000Z</pubTime>
         
         <tag>Gradle </tag>
@@ -47,7 +47,7 @@
     <lastmod>2015-06-13T16:14:44.285Z</lastmod>
     <data>
         <display>
-        <title>Android Studio-1.2版本设置教程(部分内容过时，1.3版后再更新)</title>
+        <title><![CDATA[Android Studio-1.2版本设置教程(部分内容过时，1.3版后再更新)]]></title>
         <pubTime>2015-05-02T09:01:40.000Z</pubTime>
         
         <tag>Android Studio </tag>
@@ -67,7 +67,7 @@
     <lastmod>2015-06-13T16:13:49.957Z</lastmod>
     <data>
         <display>
-        <title>Pyhon学习笔记-1</title>
+        <title><![CDATA[Pyhon学习笔记-1]]></title>
         <pubTime>2015-04-18T14:50:14.000Z</pubTime>
         
         <tag>python </tag>
@@ -87,7 +87,7 @@
     <lastmod>2015-06-13T16:13:23.199Z</lastmod>
     <data>
         <display>
-        <title>ViewHolder模式&无ViewHolder模式ListView性能对比</title>
+        <title><![CDATA[ViewHolder模式&无ViewHolder模式ListView性能对比]]></title>
         <pubTime>2015-03-23T13:49:39.000Z</pubTime>
         
         <tag>ListView </tag>
@@ -109,7 +109,7 @@
     <lastmod>2015-06-13T16:13:01.336Z</lastmod>
     <data>
         <display>
-        <title>摆脱ViewHolder，一种无需ViewHolder的高效ListView写法</title>
+        <title><![CDATA[摆脱ViewHolder，一种无需ViewHolder的高效ListView写法]]></title>
         <pubTime>2015-03-21T14:17:14.000Z</pubTime>
         
         <tag>ListView </tag>
@@ -132,7 +132,7 @@
     <lastmod>2015-06-12T15:58:45.914Z</lastmod>
     <data>
         <display>
-        <title>【转载】Android 开发最佳实践</title>
+        <title><![CDATA[【转载】Android 开发最佳实践]]></title>
         <pubTime>2015-05-20T16:27:36.000Z</pubTime>
         
         <tag>Android </tag>
@@ -152,7 +152,7 @@
     <lastmod>2015-06-12T15:55:15.418Z</lastmod>
     <data>
         <display>
-        <title>ImageView的scaleType设置不当，导致使用Glide时出现OOM</title>
+        <title><![CDATA[ImageView的scaleType设置不当，导致使用Glide时出现OOM]]></title>
         <pubTime>2015-05-16T13:07:01.000Z</pubTime>
         
         <tag>Glide </tag>
@@ -176,7 +176,7 @@
     <lastmod>2015-06-12T15:54:57.150Z</lastmod>
     <data>
         <display>
-        <title>Windows下编译最新volley为jar包</title>
+        <title><![CDATA[Windows下编译最新volley为jar包]]></title>
         <pubTime>2015-04-29T06:10:59.000Z</pubTime>
         
         <tag>volley </tag>
@@ -196,7 +196,7 @@
     <lastmod>2015-05-20T16:13:49.603Z</lastmod>
     <data>
         <display>
-        <title>解决Android Studio添加依赖时出现“Manifest merger failed”</title>
+        <title><![CDATA[解决Android Studio添加依赖时出现“Manifest merger failed”]]></title>
         <pubTime>2015-05-20T14:29:31.000Z</pubTime>
         
         <tag>Gradle </tag>
@@ -216,7 +216,7 @@
     <lastmod>2015-05-05T16:06:52.280Z</lastmod>
     <data>
         <display>
-        <title>坑爹显示器分辨率太低，任务栏遮住Android Studio的按钮了</title>
+        <title><![CDATA[坑爹显示器分辨率太低，任务栏遮住Android Studio的按钮了]]></title>
         <pubTime>2015-05-05T15:22:43.000Z</pubTime>
         
         <tag>Android Studio </tag>
