@@ -852,6 +852,30 @@ pre .deletion {
   font-size: 1.5em;
   font-family: "Titillium Web", "Helvetica Neue", Helvetica, Arial, "Microsoft Yahei", sans-serif;
 }
+.toc-article {
+  padding: 1em;
+  position: relative;
+}
+.toc-article .toc-title {
+  padding-bottom: 0.8em;
+  font-weight: bold;
+}
+#toc {
+  line-height: 1.2em;
+  font-size: 0.83em;
+}
+#toc .toc {
+  padding: 0;
+}
+#toc .toc li {
+  list-style-type: none;
+}
+#toc ol {
+  margin: 0;
+}
+#toc .toc-child {
+  padding-left: 0;
+}
 /*!
  *  Font Awesome 4.2.0 by @davegandy - http://fontawesome.io - @fontawesome
  *  License - http://fontawesome.io/license (Font: SIL OFL 1.1, CSS: MIT License)
