@@ -5,7 +5,7 @@
   <subtitle><![CDATA[写博客的时候，我会假装四处看风景]]></subtitle>
   <link href="/atom.xml" rel="self"/>
   <link href="http://licheedev.com//"/>
-  <updated>2015-06-29T13:26:36.600Z</updated>
+  <updated>2015-07-03T14:05:05.648Z</updated>
   <id>http://licheedev.com//</id>
   
   <author>
@@ -14,6 +14,29 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title><![CDATA[用回原版的Sublime了，感觉真棒]]></title>
+    <link href="http://licheedev.com/2015/07/03/use-sublime/"/>
+    <id>http://licheedev.com/2015/07/03/use-sublime/</id>
+    <published>2015-07-03T13:28:02.000Z</published>
+    <updated>2015-07-03T14:05:05.648Z</updated>
+    <content type="html"><![CDATA[<p>最近工作比较轻松，打算补补前端（虽然有可能无法坚持下去），就去慕课网上看视频。<br>然后<a href="http://www.imooc.com/course/programdetail/pid/32" target="_blank" rel="external"><strong>Web专题</strong></a>上面一开始就是介绍编辑器的，有分DW和Sublime的.<br>我不怎么想装DW，就只看了Sublime的视频。</p>
+<p>其实之前一直有用Sublime，用的 <a href="http://haojian138.blog.163.com/" target="_blank" rel="external">流风清音</a> 这个作者做的老版本汉化版，<br>不过装了之后就没配置过，所以也仅把Sublime当作记事本的替代品来用，唯一印象就是配色真心不错。</p>
+<p>看完了那Sublime的视频，发现Sublime真的很强大，不愧是神器。</p>
+<p>然后就是用eclipse、Android Studio用多了，开始有点原版强迫症，看着那汉化了的Sublime，感觉有点别扭了。<br>于是想着找个最新的原版，自己配置看看（英文逼格高啊），于是就变成这样子了，</p>
+<p><img src="http://i3.tietuku.com/fa723f8352820c31.jpg" alt="截图"></p>
+<p>装了几个插件，弄了个<a href="https://packagecontrol.io/packages/Material%20Theme" target="_blank" rel="external">Material Design</a>主题，这逼格，啧啧。</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>最近工作比较轻松，打算补补前端（虽然有可能无法坚持下去），就去慕课网上看视频。<br>然后<a href="http://www.imooc.com/course/programdetail/pid/32" target="_blank" rel="external"><s]]>
+    </summary>
+    
+      <category term="杂记" scheme="http://licheedev.com/tags/%E6%9D%82%E8%AE%B0/"/>
+    
+      <category term="杂记" scheme="http://licheedev.com/categories/%E6%9D%82%E8%AE%B0/"/>
+    
+  </entry>
   
   <entry>
     <title><![CDATA[Android Studio（1.3版本）设置Gradle代理的正确姿势]]></title>
