@@ -161,7 +161,7 @@ article.link .title a:after {
 }
 article .post-content {
   padding: 20px 20px 15px 77px;
-  margin-bottom: 50px;
+  margin-bottom: 30px;
   position: relative;
 }
 @media screen and (max-width: 600px) {
@@ -296,7 +296,7 @@ article .entry blockquote {
   font-style: italic;
   font-family: "微软雅黑", "Microsoft Yahei", "Georgia", serif;
   font-size: 13px;
-  padding: 0 20px 15px;
+  padding: 0 10px 15px;
 }
 article .entry blockquote footer {
   border-top: none;
@@ -320,7 +320,7 @@ article .entry code {
   padding: 0 5px;
   margin: 0 2px;
   font-size: 0.9em;
-  border: 1px solid #ddd;
+  border: 1px solid #0d840f;
   -webkit-border-radius: 3px;
   border-radius: 3px;
 }
@@ -460,20 +460,20 @@ article footer .tags:before {
   position: absolute;
   font: 1.1em FontAwesome;
 }
-article footer .categories:before {
+color color-link .categories:before {
   content: '\f07b';
   top: 2px;
   left: 1px;
 }
-article footer .tags:before {
+color color-link .tags:before {
   content: '\f02b';
   top: 3px;
   left: 2px;
 }
-article footer .addthis {
+color color-link .addthis {
   margin-top: 15px;
 }
-article footer .addthis iframe {
+color color-link .addthis iframe {
   margin-top: 0;
 }
 #comment {
@@ -490,10 +490,8 @@ article footer .addthis iframe {
 #pagination a {
   display: block;
   padding: 5px 10px;
-  background: #ddd;
-  color: #999;
-  font-family: "微软雅黑", "Microsoft Yahei", "Lato", Helvetica Neue, Helvetica, Arial, sans-serif;
   text-shadow: 0 0 1px #fff;
+  margin-top: 20px;
   margin-bottom: 50px;
 }
 #pagination a:hover {
@@ -834,23 +832,6 @@ pre .clojure .title {
 }
 pre .deletion {
   color: #dc322f;
-}
-.post-nav {
-  padding: 10px 40px 30px 40px;
-}
-.post-nav-prev {
-  float: left;
-}
-.post-nav-prev a {
-  font-size: 1.5em;
-  font-family: "Titillium Web", "Helvetica Neue", Helvetica, Arial, "Microsoft Yahei", sans-serif;
-}
-.post-nav-next {
-  float: right;
-}
-.post-nav-next a {
-  font-size: 1.5em;
-  font-family: "Titillium Web", "Helvetica Neue", Helvetica, Arial, "Microsoft Yahei", sans-serif;
 }
 .toc-article {
   padding: 1em;
