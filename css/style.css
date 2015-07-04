@@ -490,6 +490,8 @@ color color-link .addthis iframe {
 #pagination a {
   display: block;
   padding: 5px 10px;
+  color: #999;
+  font-family: "微软雅黑", "Microsoft Yahei", "Lato", Helvetica Neue, Helvetica, Arial, sans-serif;
   text-shadow: 0 0 1px #fff;
   margin-top: 20px;
   margin-bottom: 50px;
