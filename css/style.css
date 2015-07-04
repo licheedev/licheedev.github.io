@@ -460,20 +460,20 @@ article footer .tags:before {
   position: absolute;
   font: 1.1em FontAwesome;
 }
-color color-link .categories:before {
+article footer .categories:before {
   content: '\f07b';
   top: 2px;
   left: 1px;
 }
-color color-link .tags:before {
+article footer .tags:before {
   content: '\f02b';
   top: 3px;
   left: 2px;
 }
-color color-link .addthis {
+article footer .addthis {
   margin-top: 15px;
 }
-color color-link .addthis iframe {
+article footer .addthis iframe {
   margin-top: 0;
 }
 #comment {
