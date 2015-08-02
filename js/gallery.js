@@ -5,9 +5,10 @@
       if (!$(this).hasClass('nofancybox')){
         var alt = this.alt;
 
-        if (alt){
-          $(this).after('<span class="caption">' + alt + '</span>');
-        }
+		// 禁用图片描述
+        //if (alt){
+          //$(this).after('<span class="caption">' + alt + '</span>');
+        //}
 
         $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox" rel="gallery' + i + '" />');
       }
