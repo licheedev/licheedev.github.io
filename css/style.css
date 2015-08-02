@@ -12,9 +12,11 @@
 body {
   background: #fff url("images/line-tile.png") top left;
   color: #444;
-  font-family: "微软雅黑", "Microsoft Yahei", "Helvetica Neue", "Helvetica", Arial, sans-serif;
+  font-family: "Helvetica Neue", Helvetica, "Microsoft Yahei", "Segoe UI", Arial, freesans, sans-serif;
   font-size: 14px;
   text-shadow: 0 0 1px transparent;
+  word-wrap: break-word;
+  word-break: break-all;
 }
 @media screen and (max-width: 1260px) {
   body {
@@ -32,7 +34,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: "微软雅黑", "Microsoft Yahei", "Lato", Helvetica Neue, Helvetica, Arial, sans-serif;
+  font-family: "Helvetica Neue", Helvetica, Arial, "Microsoft Yahei", sans-serif;
 }
 h1 {
   font-size: 1.8em;
@@ -121,7 +123,7 @@ a:hover {
   margin-top: 10px;
 }
 #header #main-nav {
-  font-family: "微软雅黑", "Microsoft Yahei", "Lato", Helvetica Neue, Helvetica, Arial, sans-serif;
+  font-family: "Helvetica Neue", Helvetica, Arial, "Microsoft Yahei", sans-serif;
   font-size: 1.5em;
   line-height: 2.5em;
 }
@@ -256,7 +258,7 @@ article header .icon:before {
 }
 article header time {
   color: #999;
-  font: 0.9em "微软雅黑", "Microsoft Yahei", "Lato", Helvetica Neue, Helvetica, Arial, sans-serif;
+  font: 0.9em "Helvetica Neue", Helvetica, Arial, "Microsoft Yahei", sans-serif;
   margin-bottom: 5px;
   display: block;
   line-height: 1;
@@ -293,9 +295,8 @@ article .entry blockquote {
   border-top: 1px solid #46b974;
   border-bottom: 1px solid #46b974;
   border-left: 5px solid #46b974;
-  font-style: italic;
-  font-family: "微软雅黑", "Microsoft Yahei", "Georgia", serif;
-  font-size: 13px;
+  font-family: "Helvetica Neue", Helvetica, "Microsoft Yahei", "Segoe UI", Arial, freesans, sans-serif;
+  font-size: 1em;
   padding: 0 10px 15px;
 }
 article .entry blockquote footer {
@@ -312,14 +313,14 @@ article .entry blockquote footer cite:before {
 }
 article .entry code,
 article .entry pre {
-  font-family: "微软雅黑", "Microsoft Yahei", Monaco, Menlo, Consolas, Courier New, monospace;
+  font-family: Consolas, "Liberation Mono", Menlo, Courier, "Microsoft Yahei", monospace;
 }
 article .entry code {
   background: #0d840f;
   color: #fff;
   padding: 0 5px;
   margin: 0 2px;
-  font-size: 0.9em;
+  font-size: 1em;
   border: 1px solid #0d840f;
   -webkit-border-radius: 3px;
   border-radius: 3px;
@@ -491,7 +492,7 @@ article footer .addthis iframe {
   display: block;
   padding: 5px 10px;
   color: #999;
-  font-family: "微软雅黑", "Microsoft Yahei", "Lato", Helvetica Neue, Helvetica, Arial, sans-serif;
+  font-family: "Helvetica Neue", Helvetica, Arial, "Microsoft Yahei", sans-serif;
   text-shadow: 0 0 1px #fff;
   margin-top: 20px;
   margin-bottom: 50px;
@@ -533,7 +534,7 @@ article footer .addthis iframe {
   -webkit-box-shadow: 1px 2px 3px #ddd;
   box-shadow: 1px 2px 3px #ddd;
   border-bottom: 1px solid #ddd;
-  margin-bottom: 50px;
+  margin-bottom: 20px;
 }
 .archive article {
   -webkit-box-shadow: none;
@@ -591,7 +592,7 @@ article footer .addthis iframe {
 }
 #sidebar .search input {
   background: #fff;
-  font-family: "微软雅黑", "Microsoft Yahei", "Lato", Helvetica Neue, Helvetica, Arial, sans-serif;
+  font-family: "Helvetica Neue", Helvetica, Arial, "Microsoft Yahei", sans-serif;
   font-size: 1em;
   padding: 10px 15px;
   border: 1px solid #ddd;
@@ -680,8 +681,32 @@ article footer .addthis iframe {
 #footer {
   color: #999;
   margin-bottom: 50px;
-  font: 0.9em/1.6 "微软雅黑", "Microsoft Yahei", "Lato", Helvetica Neue, Helvetica, Arial, sans-serif;
+  font: 0.9em/1.6 "Helvetica Neue", Helvetica, Arial, "Microsoft Yahei", sans-serif;
   text-shadow: 0 0 1px #fff;
+}
+.toc-article {
+  padding: 1em;
+  position: relative;
+}
+.toc-article .toc-title {
+  padding-bottom: 0.8em;
+  font-weight: bold;
+}
+#toc {
+  line-height: 1.2em;
+  font-size: 0.83em;
+}
+#toc .toc {
+  padding: 0;
+}
+#toc .toc li {
+  list-style-type: none;
+}
+#toc ol {
+  margin: 0;
+}
+#toc .toc-child {
+  padding-left: 0;
 }
 .entry .gist {
   background: #eee;
@@ -707,7 +732,7 @@ article footer .addthis iframe {
 }
 .entry .gist .gist-file .gist-data pre {
   padding: 0 !important;
-  font-family: "微软雅黑", "Microsoft Yahei", Monaco, Menlo, Consolas, Courier New, monospace;
+  font-family: Consolas, "Liberation Mono", Menlo, Courier, "Microsoft Yahei", monospace;
 }
 .entry .gist .gist-file .gist-meta {
   background: none;
@@ -733,7 +758,7 @@ figure.highlight {
   line-height: 1.6;
   overflow: auto;
   position: relative;
-  font-size: 0.9em;
+  font-size: 1em;
 }
 figure.highlight figcaption {
   color: #999;
@@ -774,8 +799,7 @@ pre .doctype,
 pre .pi,
 pre .lisp .string,
 pre .javadoc {
-  color: #93a1a1;
-  font-style: italic;
+  color: #7f7f7f;
 }
 pre .keyword,
 pre .winutils,
@@ -785,7 +809,7 @@ pre .css .tag,
 pre .request,
 pre .status,
 pre .nginx .title {
-  color: #859900;
+  color: #e0c46c;
 }
 pre .number,
 pre .command,
@@ -795,7 +819,7 @@ pre .phpdoc,
 pre .tex .formula,
 pre .regexp,
 pre .hexcolor {
-  color: #2aa198;
+  color: #6896ba;
 }
 pre .title,
 pre .localvars,
@@ -806,7 +830,7 @@ pre .identifier,
 pre .vhdl,
 pre .literal,
 pre .id {
-  color: #268bd2;
+  color: #a6e22e;
 }
 pre .attribute,
 pre .variable,
@@ -816,7 +840,7 @@ pre .constant,
 pre .class .title,
 pre .parent,
 pre .haskell .type {
-  color: #b58900;
+  color: #cb7832;
 }
 pre .preprocessor,
 pre .preprocessor .keyword,
@@ -834,30 +858,6 @@ pre .clojure .title {
 }
 pre .deletion {
   color: #dc322f;
-}
-.toc-article {
-  padding: 1em;
-  position: relative;
-}
-.toc-article .toc-title {
-  padding-bottom: 0.8em;
-  font-weight: bold;
-}
-#toc {
-  line-height: 1.2em;
-  font-size: 0.83em;
-}
-#toc .toc {
-  padding: 0;
-}
-#toc .toc li {
-  list-style-type: none;
-}
-#toc ol {
-  margin: 0;
-}
-#toc .toc-child {
-  padding-left: 0;
 }
 /*!
  *  Font Awesome 4.2.0 by @davegandy - http://fontawesome.io - @fontawesome
