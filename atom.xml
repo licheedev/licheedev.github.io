@@ -5,7 +5,7 @@
   <subtitle><![CDATA[写博客的时候，我会假装四处看风景]]></subtitle>
   <link href="/atom.xml" rel="self"/>
   <link href="http://licheedev.com//"/>
-  <updated>2015-08-27T14:48:41.262Z</updated>
+  <updated>2015-08-27T14:53:38.759Z</updated>
   <id>http://licheedev.com//</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://licheedev.com/2015/08/27/JLPT-N1/"/>
     <id>http://licheedev.com/2015/08/27/JLPT-N1/</id>
     <published>2015-08-27T14:29:36.000Z</published>
-    <updated>2015-08-27T14:48:41.262Z</updated>
+    <updated>2015-08-27T14:53:38.759Z</updated>
     <content type="html"><![CDATA[<p>好久没写博客，水一篇好了。</p>
 <p>去年报名日语N2，结果拖延症发作，没准备好，顺便迟到没考成。</p>
 <p>过了一年多，又报名了，这次直接作死报N1。</p>
@@ -39,6 +39,8 @@
     </summary>
     
       <category term="杂记" scheme="http://licheedev.com/tags/%E6%9D%82%E8%AE%B0/"/>
+    
+      <category term="杂记" scheme="http://licheedev.com/categories/%E6%9D%82%E8%AE%B0/"/>
     
   </entry>
   
