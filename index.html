@@ -67,6 +67,48 @@
     <header>
       
         <div class="icon"></div>
+        <time datetime="2015-09-19T11:12:04.000Z"><a href="/2015/09/19/custom-glide-modelloader/">2015-09-19</a></time>
+      
+      
+  
+    <h1 class="title"><a href="/2015/09/19/custom-glide-modelloader/">加载网络图片但没URL？不要紧，通过ModelLoader，让Glide直接加载任何奇葩数据源</a></h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <h1 id="什么？加载网路图片没有url？只给我文件id？">什么？加载网路图片没有url？只给我文件id？</h1><p>最近公司项目换了七牛来存储用户文件。<br>于是获取图片方面，服务器那边不再给我完整的url，只给我个<code>fid（file id）</code>,<br>我要拿着这个fid去做个http请求，才能获取到个带token的url，只有这个带token的url才能正确获取到图片。</p>
+<p>我现在用的图片加载框架是<a href="https://github.com/bumptech/glide"><code>Glide</code></a>，很赞，Google都用它。</p>
+<p>那就是说，我现在要加载一个网络图片，要做两次http请求：<br><code>先用http请求获取url</code>，<code>再用Glide加载这个url（第二次请求）</code>；<br>由于Android不允许UI线程访问网络，所以我必须开一个线程来获取那个url，而Glide加载和处理图片时，也会开线程。<br>于是多线程异步问题来了，如果用在ListView等地方，那么十有八九出现图片加载错乱的情况（真出现了）。</p>
+<p><img src="http://i3.tietuku.com/f871922b043b08f1.gif" alt="233"><br>
+      
+    </div>
+    <footer>
+      
+        
+          <div class="alignleft">
+            <a href="/2015/09/19/custom-glide-modelloader/#more" class="more-link">查看全文</a>
+          </div>
+        
+        
+      
+      <div class="clearfix"></div>
+    </footer>
+
+  </div>
+</article>
+
+
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"1","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"16"},"slide":{"type":"slide","bdImg":"3","bdPos":"right","bdTop":"100"}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+
+
+
+  <article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
         <time datetime="2015-09-12T14:55:28.000Z"><a href="/2015/09/12/bougth-two-android-books/">2015-09-12</a></time>
       
       
@@ -440,49 +482,6 @@
 
 
 
-  <article class="post">
-  
-  <div class="post-content">
-    <header>
-      
-        <div class="icon"></div>
-        <time datetime="2015-05-02T09:01:40.000Z"><a href="/2015/05/02/android-studio-settings/">2015-05-02</a></time>
-      
-      
-  
-    <h1 class="title"><a href="/2015/05/02/android-studio-settings/">Android Studio-1.2版本设置教程(部分内容过时，1.3版后再更新)</a></h1>
-  
-
-    </header>
-    <div class="entry">
-      
-        <blockquote>
-<p><strong>转载请注明原文出处 <a href="http://www.licheedev.com/2015/05/02/android-studio-settings/">http://www.licheedev.com/2015/05/02/android-studio-settings/</a> </strong></p>
-</blockquote>
-<p>这两天Google更新了Android Studio 1.2正式版，新版本的设置界面大变面，设置条目较旧版本进行了归类，不像以前那样列表长长的了。</p>
-<p>趁着安装新版本的机会，把常用的设置记录一下，放到博客里面，以作备忘。</p>
-      
-    </div>
-    <footer>
-      
-        
-          <div class="alignleft">
-            <a href="/2015/05/02/android-studio-settings/#more" class="more-link">查看全文</a>
-          </div>
-        
-        
-      
-      <div class="clearfix"></div>
-    </footer>
-
-  </div>
-</article>
-
-
-<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"1","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"16"},"slide":{"type":"slide","bdImg":"3","bdPos":"right","bdTop":"100"}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
-
-
-
 
 <nav id="pagination">
   
@@ -553,7 +552,7 @@ var duoshuoQuery = {short_name:"licheedev"};
   <h3 class="title">目录</h3>
   <ul class="entry">
   
-    <li><a href="/categories/Android/">Android</a><small>10</small></li>
+    <li><a href="/categories/Android/">Android</a><small>11</small></li>
   
     <li><a href="/categories/python/">python</a><small>1</small></li>
   
@@ -567,7 +566,7 @@ var duoshuoQuery = {short_name:"licheedev"};
 <div class="widget tagcloud">
   <h3 class="title">标签云</h3>
   <div class="entry">
-    <a href="/tags/Android/" style="font-size: 10px;">Android</a> <a href="/tags/Android-Studio/" style="font-size: 15px;">Android Studio</a> <a href="/tags/Glide/" style="font-size: 10px;">Glide</a> <a href="/tags/Gradle/" style="font-size: 20px;">Gradle</a> <a href="/tags/ImageView/" style="font-size: 10px;">ImageView</a> <a href="/tags/ListView/" style="font-size: 15px;">ListView</a> <a href="/tags/ViewHolder/" style="font-size: 15px;">ViewHolder</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/scaleType/" style="font-size: 10px;">scaleType</a> <a href="/tags/volley/" style="font-size: 10px;">volley</a> <a href="/tags/杂记/" style="font-size: 20px;">杂记</a>
+    <a href="/tags/Android/" style="font-size: 10px;">Android</a> <a href="/tags/Android-Studio/" style="font-size: 15px;">Android Studio</a> <a href="/tags/Glide/" style="font-size: 15px;">Glide</a> <a href="/tags/Gradle/" style="font-size: 20px;">Gradle</a> <a href="/tags/ImageView/" style="font-size: 10px;">ImageView</a> <a href="/tags/ListView/" style="font-size: 15px;">ListView</a> <a href="/tags/ViewHolder/" style="font-size: 15px;">ViewHolder</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/scaleType/" style="font-size: 10px;">scaleType</a> <a href="/tags/volley/" style="font-size: 10px;">volley</a> <a href="/tags/杂记/" style="font-size: 20px;">杂记</a>
   </div>
 </div>
 
@@ -576,6 +575,10 @@ var duoshuoQuery = {short_name:"licheedev"};
 <div class="widget tag">
   <h3 class="title">最近文章</h3>
   <ul class="entry">
+    
+      <li>
+        <a href="/2015/09/19/custom-glide-modelloader/">加载网络图片但没URL？不要紧，通过ModelLoader，让Glide直接加载任何奇葩数据源</a>
+      </li>
     
       <li>
         <a href="/2015/09/12/bougth-two-android-books/">又作死屯了两本书：《Android群英传》+《Android开发艺术探索》</a>
@@ -591,10 +594,6 @@ var duoshuoQuery = {short_name:"licheedev"};
     
       <li>
         <a href="/2015/06/22/gradle-proxy-for-as-1-3/">Android Studio（1.3版本）设置Gradle代理的正确姿势</a>
-      </li>
-    
-      <li>
-        <a href="/2015/05/23/android-multi-dex/">使用Multidex解决App方法数超过65536限制问题</a>
       </li>
     
   </ul>

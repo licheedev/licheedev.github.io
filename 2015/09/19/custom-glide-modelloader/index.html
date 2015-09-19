@@ -1,0 +1,328 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>加载网络图片但没URL？不要紧，通过ModelLoader，让Glide直接加载任何奇葩数据源 | LicheeDev-某黎的博客</title>
+  <meta name="author" content="John Lee">
+  
+  <meta name="description" content="黎某人的博客。乱七八糟都记点。">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="加载网络图片但没URL？不要紧，通过ModelLoader，让Glide直接加载任何奇葩数据源"/>
+  <meta property="og:site_name" content="LicheeDev-某黎的博客"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  <link href="/favicon.png" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="LicheeDev-某黎的博客" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.css" rel="stylesheet">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+<script>
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+	ga('create', 'UA-64082407-1', 'auto');
+	ga('send', 'pageview');
+
+</script>
+
+
+</head>
+
+
+<body>
+  <header id="header" class="inner"><div class="alignleft">
+  <h1><a href="/">LicheeDev-某黎的博客</a></h1>
+  <h2><a href="/">写博客的时候，我会假装四处看风景</a></h2>
+</div>
+<nav id="main-nav" class="alignright">
+  <ul>
+    
+      <li><a href="/">首页</a></li>
+    
+      <li><a href="/archives">归档</a></li>
+    
+      <li><a href="/about">关于</a></li>
+    
+      <li><a href="/atom.xml">订阅鄙站</a></li>
+    
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+<div class="clearfix"></div></header>
+  <div id="content" class="inner">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2015-09-19T11:12:04.000Z"><a href="/2015/09/19/custom-glide-modelloader/">2015-09-19</a></time>
+      
+      
+  
+    <h1 class="title">加载网络图片但没URL？不要紧，通过ModelLoader，让Glide直接加载任何奇葩数据源</h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <h1 id="什么？加载网路图片没有url？只给我文件id？">什么？加载网路图片没有url？只给我文件id？</h1><p>最近公司项目换了七牛来存储用户文件。<br>于是获取图片方面，服务器那边不再给我完整的url，只给我个<code>fid（file id）</code>,<br>我要拿着这个fid去做个http请求，才能获取到个带token的url，只有这个带token的url才能正确获取到图片。</p>
+<p>我现在用的图片加载框架是<a href="https://github.com/bumptech/glide" target="_blank" rel="external"><code>Glide</code></a>，很赞，Google都用它。</p>
+<p>那就是说，我现在要加载一个网络图片，要做两次http请求：<br><code>先用http请求获取url</code>，<code>再用Glide加载这个url（第二次请求）</code>；<br>由于Android不允许UI线程访问网络，所以我必须开一个线程来获取那个url，而Glide加载和处理图片时，也会开线程。<br>于是多线程异步问题来了，如果用在ListView等地方，那么十有八九出现图片加载错乱的情况（真出现了）。</p>
+<p><img src="http://i3.tietuku.com/f871922b043b08f1.gif" alt="233"><br><a id="more"></a></p>
+<p>当然，可以通过加一堆判断来规避这个问题，但总感觉不怎么爽。<br>如果可以修改Glide加载图片的过程，把第一次请求url的操作塞进去，<br>然后像加载普通url那样，直接用我们的fid加载图片，就爽了。</p>
+<h1 id="初战铩羽而归">初战铩羽而归</h1><p>于是果断翻翻Glide项目的wiki，看看能不能干些什么。<br>然后我翻到这页：</p>
+<blockquote>
+<p><a href="https://github.com/bumptech/glide/wiki/Downloading-custom-sizes-with-Glide" target="_blank" rel="external">https://github.com/bumptech/glide/wiki/Downloading-custom-sizes-with-Glide</a></p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyUrlLoader</span> <span class="keyword">extends</span> <span class="title">BaseGlideUrlLoader</span>&lt;<span class="title">MyDataModel</span>&gt; </span>&#123;</span><br><span class="line">    <span class="annotation">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> String <span class="title">getUrl</span><span class="params">(MyDataModel model, <span class="keyword">int</span> width, <span class="keyword">int</span> height)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// Construct the url for the correct size here.</span></span><br><span class="line">        <span class="keyword">return</span> model.buildUrl(width, height);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>蛤蛤，貌似有戏，我在这个<code>getUrl()</code>回调里面做次请求，返回获取到的url不就行了么，剩下就交给Glide处理，赞。</p>
+<p>当然，凡事没这么简单了。谁知道这<code>getUrl()</code>回调运行在<code>UI线程</code>中，而在Android 3.0以上，UI线程中不允许进行网络操作。<br>这方案没戏。</p>
+<h1 id="高人指点">高人指点</h1><p>好吧，这下好了，刚燃起的希望，一下子又熄灭了。<br>想起了刚开始用Glide的时候，发过issue，这次也发个<a href="https://github.com/bumptech/glide/issues/634" target="_blank" rel="external"><code>issue</code></a>好了。</p>
+<p>这次<a href="https://github.com/TWiStErRob" target="_blank" rel="external"><code>@TWiStErRob</code></a>大神依旧给力，很快就给了解决方案，虽然只有文字描述。</p>
+<blockquote>
+<p>You have to write a model loader. Create a wrapper class for integer and maybe add in the token as well.<br><a href="https://github.com/bumptech/glide/wiki/Downloading-custom-sizes-with-Glide" target="_blank" rel="external">https://github.com/bumptech/glide/wiki/Downloading-custom-sizes-with-Glide</a><br>Your model loader can create a fetcher that makes one request for the token and one request for the image, and return the second’s stream.<br>Or you can make the token request separately inside BaseGlideUrlLoader.getUrl (see wiki), then return the URL and let Glide take care of the rest “as usual”.</p>
+</blockquote>
+<p>简单来说，大神说了两个方案：</p>
+<ol>
+<li>全完实现ModelLoader和DataFetcher。</li>
+<li>我上面说的那个失败了的<code>getUrl()</code>请求url的方案。</li>
+</ol>
+<p>其实第二种方案属于第一种的特殊情况，BaseGlideUrlLoader就是ModelLoader的子类，已经实现好从url拉数据的细节。</p>
+<p>这样看的话，其实我一开始的方向就是对的，遗憾的是没钻进去研究更底端层次的，懒啊。</p>
+<p>于是参考了Glide中，部分已经实现好的ModelLoader和DataFetcher的子类，自己试着写了下，真成功了。下面说说细节。</p>
+<h1 id="搞掂">搞掂</h1><h2 id="模拟案例">模拟案例</h2><p>这里模拟了个DEMO，放在github上：</p>
+<blockquote>
+<p><a href="https://github.com/licheedev/Custom-Glide-ModelLoader-Demo" target="_blank" rel="external">https://github.com/licheedev/Custom-Glide-ModelLoader-Demo</a></p>
+</blockquote>
+<p>当然，我不可能把公司的接口公布出去，于是用一种很坑爹的方式，去模拟用fid获取url的接口。<br>因为我这个案例的关键的地方是<code>两次请求</code>，<br>于是我放了个<a href="http://7xlwmc.com1.z0.glb.clouddn.com/prefix.json" target="_blank" rel="external"><code>静态json</code></a>在七牛上，</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  "<span class="attribute">prefix</span>": <span class="value"><span class="string">"http://7xlwmc.com1.z0.glb.clouddn.com/"</span></span><br><span class="line"></span>&#125;</span><br></pre></td></tr></table></figure>
+<p>其实就是一个完整url的前缀，当然也没有token，每次加载一个<code>fid</code>的时候，都会<code>&quot;多此一举&quot;</code>地拉这个json回来解析，<br>然后把<code>prefix</code>拼上<code>fid</code>，就是一个可用的url：<br>比如这个<a href="http://7xlwmc.com1.z0.glb.clouddn.com/SAMPLE_IMG_008.jpg" target="_blank" rel="external"><code>http://7xlwmc.com1.z0.glb.clouddn.com/SAMPLE_IMG_008.jpg</code></a>。</p>
+<p>这就完成了一次请求。</p>
+<h2 id="细节">细节</h2><p>下面代码的写法参考了Glide自带的<a href="https://github.com/bumptech/glide/blob/master/library/src/main/java/com/bumptech/glide/load/model/stream/HttpGlideUrlLoader.java" target="_blank" rel="external"><code>HttpGlideUrlLoader</code></a> 和 <a href="https://github.com/bumptech/glide/blob/master/library/src/main/java/com/bumptech/glide/load/data/HttpUrlFetcher.java" target="_blank" rel="external"><code>HttpUrlFetcher</code></a></p>
+<h3 id="ImageFidLoader">ImageFidLoader</h3><p>主要就是实现<code>getResourceFetcher()</code>方法，返回一个<code>DataFetcher</code>对象。<br><code>ModelLoaderFactory</code>的用法可以看下面的配置引用页。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ImageFidLoader</span> <span class="keyword">implements</span> <span class="title">ModelLoader</span>&lt;<span class="title">ImageFid</span>,<span class="title">InputStream</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> ModelCache&lt;ImageFid, ImageFid&gt; mModelCache;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ImageFidLoader</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>(<span class="keyword">null</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ImageFidLoader</span><span class="params">(ModelCache&lt;ImageFid, ImageFid&gt; modelCache)</span> </span>&#123;</span><br><span class="line">        mModelCache = modelCache;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="annotation">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> DataFetcher&lt;InputStream&gt; <span class="title">getResourceFetcher</span><span class="params">(ImageFid model, <span class="keyword">int</span> width, <span class="keyword">int</span> height)</span> </span>&#123;</span><br><span class="line">        ImageFid imageFid = model;</span><br><span class="line">        <span class="comment">// 从缓存中取出ImageFid,ImgeFid已重写equals()和hashCode()方法</span></span><br><span class="line">        <span class="comment">// 缓存中ImgeFid对象的url，有可能还没被初始化</span></span><br><span class="line">        <span class="keyword">if</span> (mModelCache != <span class="keyword">null</span>) &#123;</span><br><span class="line">            imageFid = mModelCache.get(model, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">            <span class="keyword">if</span> (imageFid == <span class="keyword">null</span>) &#123;</span><br><span class="line">                mModelCache.put(model, <span class="number">0</span>, <span class="number">0</span>, model);</span><br><span class="line">                imageFid = model;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ImageFidFetcher(imageFid);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ModelLoader工厂，在向Glide注册自定义ModelLoader时使用到</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Factory</span> <span class="keyword">implements</span> <span class="title">ModelLoaderFactory</span>&lt;<span class="title">ImageFid</span>, <span class="title">InputStream</span>&gt; </span>&#123;</span><br><span class="line">        <span class="comment">// 缓存</span></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">final</span> ModelCache&lt;ImageFid, ImageFid&gt; mModelCache = <span class="keyword">new</span> ModelCache&lt;&gt;(<span class="number">500</span>);</span><br><span class="line">        </span><br><span class="line">        <span class="annotation">@Override</span></span><br><span class="line">        <span class="keyword">public</span> ModelLoader&lt;ImageFid, InputStream&gt; build(Context context,</span><br><span class="line">            GenericLoaderFactory factories) &#123;</span><br><span class="line">            <span class="comment">// 返回ImageFidLoader对象</span></span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> ImageFidLoader(mModelCache);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="annotation">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">teardown</span><span class="params">()</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="ImageFidFetcher">ImageFidFetcher</h3><p>注意<code>loadData()</code>、<code>cleanup()</code>、<code>getId()</code>和<code>cancel()</code>四个回调方法的作用场景。<br>在<code>loadData()</code>中，这里进行了两次请求，一次拿url，一次拿图片数据。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ImageFidFetcher</span> <span class="keyword">implements</span> <span class="title">DataFetcher</span>&lt;<span class="title">InputStream</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 检查是否取消任务的标识</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">boolean</span> mIsCanceled;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> ImageFid mImageFid;</span><br><span class="line">    <span class="keyword">private</span> Call mFetchUrlCall;</span><br><span class="line">    <span class="keyword">private</span> Call mFetchStreamCall;</span><br><span class="line">    <span class="keyword">private</span> InputStream mInputStream;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ImageFidFetcher</span><span class="params">(ImageFid imageFid)</span> </span>&#123;</span><br><span class="line">        mImageFid = imageFid;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span><br><span class="line">     * 在后台线程中调用，用于获取图片的数据流，给Glide处理</span><br><span class="line">     * <span class="doctag">@param</span> priority</span><br><span class="line">     * <span class="doctag">@return</span></span><br><span class="line">     * <span class="doctag">@throws</span> Exception</span><br><span class="line">     */</span></span><br><span class="line">    <span class="annotation">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> InputStream <span class="title">loadData</span><span class="params">(Priority priority)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="comment">// mImageFid有可能是来自缓存的，先从此对象获取url</span></span><br><span class="line">        String url = mImageFid.getUrl();</span><br><span class="line">        <span class="keyword">if</span> (url == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (mIsCanceled) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 建立http请求，从网络上获取fid对应的的url</span></span><br><span class="line">            url = fetchImageUrl();</span><br><span class="line">            <span class="keyword">if</span> (url == <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 存储获取到的url，以供缓存使用</span></span><br><span class="line">            mImageFid.setUrl(url);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (mIsCanceled) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 再次建立http请求，获取url的流</span></span><br><span class="line">        mInputStream = fetchStream(url);</span><br><span class="line">        <span class="keyword">return</span> mInputStream;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span><br><span class="line">     * 获取图片fid对应的url</span><br><span class="line">     * <span class="doctag">@return</span></span><br><span class="line">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> String <span class="title">fetchImageUrl</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 缓存请求，用来及时取消连接</span></span><br><span class="line">        mFetchUrlCall = syncGet(Config.IMAGE_REQUEST_URL);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            String json = mFetchUrlCall.execute().body().string();</span><br><span class="line">            JSONObject jsonObject = <span class="keyword">new</span> JSONObject(json);</span><br><span class="line">            <span class="keyword">return</span> jsonObject.getString(<span class="string">"prefix"</span>) + mImageFid.getFid();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            <span class="comment">//e.printStackTrace();</span></span><br><span class="line">        &#125; <span class="keyword">catch</span> (JSONException e) &#123;</span><br><span class="line">            <span class="comment">//e.printStackTrace();</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">private</span> InputStream <span class="title">fetchStream</span><span class="params">(String url)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 缓存请求，用来及时取消连接</span></span><br><span class="line">        mFetchStreamCall = syncGet(url);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> mFetchStreamCall.execute().body().byteStream();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            <span class="comment">//e.printStackTrace();</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span><br><span class="line">     * 同步的http get请求</span><br><span class="line">     * <span class="doctag">@param</span> url 要访问的url</span><br><span class="line">     * <span class="doctag">@return</span></span><br><span class="line">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> Call <span class="title">syncGet</span><span class="params">(String url)</span> </span>&#123;</span><br><span class="line">        Request request = <span class="keyword">new</span> Request.Builder().url(url).get().build();</span><br><span class="line">        <span class="keyword">return</span> OkHttpManager.getClient().newCall(request);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span><br><span class="line">     * 在后台线程中调用，在Glide处理完&#123;<span class="doctag">@link</span> #loadData(Priority)&#125;返回的数据后，进行清理和回收资源</span><br><span class="line">     */</span></span><br><span class="line">    <span class="annotation">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">cleanup</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (mInputStream != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                mInputStream.close();</span><br><span class="line">            &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">                <span class="comment">//e.printStackTrace();</span></span><br><span class="line">            &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">                mInputStream = <span class="keyword">null</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span><br><span class="line">     * 在UI线程中调用，返回用于区别数据的唯一id</span><br><span class="line">     * <span class="doctag">@return</span></span><br><span class="line">     */</span></span><br><span class="line">    <span class="annotation">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getId</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> mImageFid.getFid();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span><br><span class="line">     * 在UI线程中调用，取消加载任务</span><br><span class="line">     */</span></span><br><span class="line">    <span class="annotation">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">cancel</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        mIsCanceled = <span class="keyword">true</span>;</span><br><span class="line">        <span class="comment">// 取消获取url</span></span><br><span class="line">        <span class="keyword">if</span> (mFetchUrlCall != <span class="keyword">null</span>) &#123;</span><br><span class="line">            mFetchUrlCall.cancel();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 取消下载文件</span></span><br><span class="line">        <span class="keyword">if</span> (mFetchStreamCall != <span class="keyword">null</span>) &#123;</span><br><span class="line">            mFetchStreamCall.cancel();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="CustomGlideModule">CustomGlideModule</h3><p>配置Glide，注册ModelLoader。<br>具体参照：</p>
+<blockquote>
+<p><a href="https://github.com/bumptech/glide/wiki/Configuration" target="_blank" rel="external">https://github.com/bumptech/glide/wiki/Configuration</a> <br><br><a href="https://github.com/bumptech/glide/releases" target="_blank" rel="external">https://github.com/bumptech/glide/releases</a> <br><br><a href="https://github.com/bumptech/glide/wiki/Downloading-custom-sizes-with-Glide" target="_blank" rel="external">https://github.com/bumptech/glide/wiki/Downloading-custom-sizes-with-Glide</a></p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CustomGlideModule</span> <span class="keyword">implements</span> <span class="title">GlideModule</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="annotation">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">applyOptions</span><span class="params">(Context context, GlideBuilder builder)</span> </span>&#123;</span><br><span class="line">        ViewTarget.setTagId(R.id.glide_tag_id); <span class="comment">// 设置别的get/set tag id，以免占用View默认的</span></span><br><span class="line">        builder.setDecodeFormat(DecodeFormat.PREFER_ARGB_8888); <span class="comment">// 设置图片质量为高质量</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="annotation">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">registerComponents</span><span class="params">(Context context, Glide glide)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 注册我们的ImageFidLoader</span></span><br><span class="line">        glide.register(ImageFid.class, InputStream.class, <span class="keyword">new</span> ImageFidLoader.Factory());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="ItemAdapter">ItemAdapter</h3><p>这里展示了怎么直接使用fid来加载图片。跟普通的直接加载URL没什么两样。</p>
+<p>如果没有在自定义GlideModule注册ModelLoader，<br>则每次加载图片，都需要调用<code>using(new MyUrlLoader())</code>注册ModelLoader，<br>即<code>Glide.with(yourFragment).using(new MyUrlLoader()).load(yourModel).into(yourView);</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ItemAdapter</span> <span class="keyword">extends</span> <span class="title">ArrayAdapter</span>&lt;<span class="title">ImageFid</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> DrawableRequestBuilder&lt;ImageFid&gt; mGlideBuilder;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ItemAdapter</span><span class="params">(Context context, ImageFid[] images)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(context, <span class="number">0</span>, images);</span><br><span class="line">        mGlideBuilder = Glide.with(context)</span><br><span class="line">            .from(ImageFid.class) <span class="comment">// 设置数据源类型为我们的ImageFid</span></span><br><span class="line">            .fitCenter().crossFade()</span><br><span class="line">            .diskCacheStrategy(DiskCacheStrategy.ALL) <span class="comment">// 设置本地缓存,缓存源文件和目标图像</span></span><br><span class="line">            .placeholder(R.mipmap.ic_launcher);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="annotation">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> View <span class="title">getView</span><span class="params">(<span class="keyword">int</span> position, View convertView, ViewGroup parent)</span> </span>&#123;</span><br><span class="line">        ViewHolder holder;</span><br><span class="line">        ...</span><br><span class="line">        ImageFid fid = getItem(position);</span><br><span class="line">        <span class="comment">// 加载fid</span></span><br><span class="line">        mGlideBuilder.load(fid).into(holder.ivImage);</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">return</span> convertView;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">ViewHolder</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="效果">效果</h2><h3 id="网络加载">网络加载</h3><p><img src="http://i3.tietuku.com/d538c803eaee2b0c.gif" alt="网络加载"></p>
+<h3 id="加载缓存">加载缓存</h3><p><img src="http://i3.tietuku.com/ac977926e5a0f82d.gif" alt="加载缓存"></p>
+<h1 id="总结">总结</h1><p>首先再次感谢<a href="https://github.com/TWiStErRob" target="_blank" rel="external"><code>@TWiStErRob</code></a>大神，这次又帮了我。<br>还有就是，用好开源项目，有时候还真的要多看点源码，毕竟文档有时候写得不够完整。</p>
+
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/Android/">Android</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/Glide/">Glide</a>
+  </div>
+
+        
+        <nav id="pagination">
+
+
+      
+
+      
+        <a href="/2015/09/12/bougth-two-android-books/" class="alignright next">后一篇</a>
+      
+
+</nav>
+      
+      <div class="clearfix"></div>
+    </footer>
+
+  </div>
+</article>
+
+
+<section id="comment">
+  <h1 class="title">评论</h1>
+
+    <div class="ds-thread" data-thread-key="2015/09/19/custom-glide-modelloader/" data-title="加载网络图片但没URL？不要紧，通过ModelLoader，让Glide直接加载任何奇葩数据源" data-url="http://licheedev.com/2015/09/19/custom-glide-modelloader/"></div>
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"licheedev"};
+    (function() {
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.unstable.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0] 
+         || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+    </script>
+  </section>
+  
+  
+
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"1","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"16"},"slide":{"type":"slide","bdImg":"3","bdPos":"right","bdTop":"100"}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+
+</div></div>
+    <aside id="sidebar" class="alignright">
+  
+<div class="widget social">
+  <h3 class="title">文章目录</h3>
+  <div id="toc" class="toc-article">
+<ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#什么？加载网路图片没有url？只给我文件id？"><span class="toc-number">1.</span> <span class="toc-text">什么？加载网路图片没有url？只给我文件id？</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#初战铩羽而归"><span class="toc-number">2.</span> <span class="toc-text">初战铩羽而归</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#高人指点"><span class="toc-number">3.</span> <span class="toc-text">高人指点</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#搞掂"><span class="toc-number">4.</span> <span class="toc-text">搞掂</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#模拟案例"><span class="toc-number">4.1.</span> <span class="toc-text">模拟案例</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#细节"><span class="toc-number">4.2.</span> <span class="toc-text">细节</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#ImageFidLoader"><span class="toc-number">4.2.1.</span> <span class="toc-text">ImageFidLoader</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ImageFidFetcher"><span class="toc-number">4.2.2.</span> <span class="toc-text">ImageFidFetcher</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#CustomGlideModule"><span class="toc-number">4.2.3.</span> <span class="toc-text">CustomGlideModule</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ItemAdapter"><span class="toc-number">4.2.4.</span> <span class="toc-text">ItemAdapter</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#效果"><span class="toc-number">4.3.</span> <span class="toc-text">效果</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#网络加载"><span class="toc-number">4.3.1.</span> <span class="toc-text">网络加载</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#加载缓存"><span class="toc-number">4.3.2.</span> <span class="toc-text">加载缓存</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#总结"><span class="toc-number">5.</span> <span class="toc-text">总结</span></a></li></ol>
+</div>
+</div>
+
+
+  <div class="search">
+  <form action="//google.com/search" method="get" accept-charset="utf-8">
+    <input type="search" name="q" results="0" placeholder="Google本站">
+    <input type="hidden" name="q" value="site:licheedev.com">
+  </form>
+</div>
+
+  
+<div class="widget social">
+  <h3 class="title">联系</h3>
+  <ul class="my-socials">
+    
+    <li>
+  	  <a href="https://github.com/licheedev" class="github" target="_blank">
+  		  <i class="fa fa-github"></i>
+  	  </a>
+    </li>
+    
+    <li>
+  	  <a href="http://weibo.com/licheedev" class="weibo" target="_blank">
+  		  <i class="fa fa-weibo"></i>
+  	  </a>
+    </li>
+    
+    
+    <li>
+   	  <a href="mailto:licheedev@foxmail.com" class="email" target="_blank" title="Email Me">
+  		 <i class="fa fa-envelope"></i>
+  	  </a>
+    </li>
+    
+  </ul>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">目录</h3>
+  <ul class="entry">
+  
+    <li><a href="/categories/Android/">Android</a><small>11</small></li>
+  
+    <li><a href="/categories/python/">python</a><small>1</small></li>
+  
+    <li><a href="/categories/杂记/">杂记</a><small>3</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tagcloud">
+  <h3 class="title">标签云</h3>
+  <div class="entry">
+    <a href="/tags/Android/" style="font-size: 10px;">Android</a> <a href="/tags/Android-Studio/" style="font-size: 15px;">Android Studio</a> <a href="/tags/Glide/" style="font-size: 15px;">Glide</a> <a href="/tags/Gradle/" style="font-size: 20px;">Gradle</a> <a href="/tags/ImageView/" style="font-size: 10px;">ImageView</a> <a href="/tags/ListView/" style="font-size: 15px;">ListView</a> <a href="/tags/ViewHolder/" style="font-size: 15px;">ViewHolder</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/scaleType/" style="font-size: 10px;">scaleType</a> <a href="/tags/volley/" style="font-size: 10px;">volley</a> <a href="/tags/杂记/" style="font-size: 20px;">杂记</a>
+  </div>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">最近文章</h3>
+  <ul class="entry">
+    
+      <li>
+        <a href="/2015/09/19/custom-glide-modelloader/">加载网络图片但没URL？不要紧，通过ModelLoader，让Glide直接加载任何奇葩数据源</a>
+      </li>
+    
+      <li>
+        <a href="/2015/09/12/bougth-two-android-books/">又作死屯了两本书：《Android群英传》+《Android开发艺术探索》</a>
+      </li>
+    
+      <li>
+        <a href="/2015/08/27/JLPT-N1/">又报名日语能力考了，希望这次能认真备考</a>
+      </li>
+    
+      <li>
+        <a href="/2015/07/03/use-sublime/">用回原版的Sublime了，感觉真棒</a>
+      </li>
+    
+      <li>
+        <a href="/2015/06/22/gradle-proxy-for-as-1-3/">Android Studio（1.3版本）设置Gradle代理的正确姿势</a>
+      </li>
+    
+  </ul>
+</div>
+
+</aside>
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><div class="alignleft">
+  
+  &copy; 2015 John Lee
+  . 
+  Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> 
+  Theme by <a href="https://github.com/licheedev/hexo-theme-lightgreen" target="_blank">LightGreen</a> .
+              <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+            <span id="busuanzi_container_site_pv">本站总访问量 <a href="http://service.ibruce.info/" target="_blank"><span id="busuanzi_value_site_pv"></span></a> 次</span>
+</div>
+<div class="clearfix"></div></footer>
+  <script src="/js/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+<div id="totop" style="position:fixed;bottom:50px;right:50px;cursor: pointer;">
+<a title="返回顶部"><img src="/imgs/scrollup.png"/></a>
+</div>
+<script src="/js/totop.js"></script>
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?c1a996e9a88b120ebf33af09f6dcc6ca";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+</body>
+</html>
