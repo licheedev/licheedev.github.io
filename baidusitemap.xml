@@ -4,7 +4,7 @@
     
   <url>
     <loc>http://licheedev.com/2015/09/19/custom-glide-modelloader/</loc>
-    <lastmod>2015-09-20T03:57:51.058Z</lastmod>
+    <lastmod>2015-09-20T04:02:12.946Z</lastmod>
     <data>
         <display>
         <title><![CDATA[加载网络图片但没URL？不要紧，通过ModelLoader，让Glide直接加载任何奇葩数据源]]></title>
