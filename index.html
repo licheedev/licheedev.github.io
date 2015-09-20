@@ -78,7 +78,7 @@
     <div class="entry">
       
         <h1 id="什么？加载网路图片没有url？只给我文件id？">什么？加载网路图片没有url？只给我文件id？</h1><p>最近公司项目换了七牛来存储用户文件。<br>于是获取图片方面，服务器那边不再给我完整的url，只给我个<code>fid（file id）</code>,<br>我要拿着这个fid去做个http请求，才能获取到个带token的url，只有这个带token的url才能正确获取到图片。</p>
-<p>我现在用的图片加载框架是<a href="https://github.com/bumptech/glide"><code>Glide</code></a>，很赞，Google都用它。</p>
+<p>我现在用的图片加载框架是<a href="https://github.com/bumptech/glide"><code>Glide</code></a>，很赞，Google都用它。Glide基础用法参考-&gt;<a href="http://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2015/0823/3353.html">这里</a></p>
 <p>那就是说，我现在要加载一个网络图片，要做两次http请求：<br><code>先用http请求获取url</code>，<code>再用Glide加载这个url（第二次请求）</code>；<br>由于Android不允许UI线程访问网络，所以我必须开一个线程来获取那个url，而Glide加载和处理图片时，也会开线程。<br>于是多线程异步问题来了，如果用在ListView等地方，那么十有八九出现图片加载错乱的情况（真出现了）。</p>
 <p><img src="http://i3.tietuku.com/f871922b043b08f1.gif" alt="233"><br>
       
