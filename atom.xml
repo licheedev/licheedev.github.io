@@ -5,7 +5,7 @@
   <subtitle><![CDATA[写博客的时候，我会假装四处看风景]]></subtitle>
   <link href="/atom.xml" rel="self"/>
   <link href="http://licheedev.com//"/>
-  <updated>2015-10-25T16:41:35.771Z</updated>
+  <updated>2015-10-25T16:45:55.372Z</updated>
   <id>http://licheedev.com//</id>
   
   <author>
@@ -20,8 +20,8 @@
     <link href="http://licheedev.com/2015/10/26/rxjava-diao-bao-le/"/>
     <id>http://licheedev.com/2015/10/26/rxjava-diao-bao-le/</id>
     <published>2015-10-25T16:07:06.000Z</published>
-    <updated>2015-10-25T16:41:35.771Z</updated>
-    <content type="html"><![CDATA[<p>之前就知道有RxJava这玩意，知道这玩意很屌，不过也就止于看看标题，看几段介绍的程度（懒癌害人不浅）。<br>这周心血来潮，抽空把之前收藏的 <a href="https://github.com/rengwuxian" target="_blank" rel="external">扔物线</a>大神写的RxJava入门文章看了。</p>
+    <updated>2015-10-25T16:45:55.372Z</updated>
+    <content type="html"><![CDATA[<p>之前就知道有RxJava这玩意，知道这玩意很屌，不过也就止于看看标题，看几段介绍的程度（懒癌害人不浅）。<br>这周心血来潮，抽空把之前收藏的 <a href="https://github.com/rengwuxian" target="_blank" rel="external">扔物线</a> 大神写的RxJava入门文章看了。</p>
 <blockquote>
 <p><a href="http://gank.io/post/560e15be2dca930e00da1083" target="_blank" rel="external">http://gank.io/post/560e15be2dca930e00da1083</a></p>
 </blockquote>
@@ -70,7 +70,7 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Observable.create(onSubscribe)</span><br><span class="line">    .subscribeOn(Schedulers.io())</span><br><span class="line">    .doOnSubscribe(<span class="keyword">new</span> Action0() &#123;</span><br><span class="line">        <span class="annotation">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">call</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            progressBar.setVisibility(View.VISIBLE); <span class="comment">// 需要在主线程执行</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">    .subscribeOn(AndroidSchedulers.mainThread()) <span class="comment">// 指定主线程</span></span><br><span class="line">    .observeOn(AndroidSchedulers.mainThread())</span><br><span class="line">    .subscribe(subscriber);</span><br></pre></td></tr></table></figure>
 ]]></content>
     <summary type="html">
-    <![CDATA[<p>之前就知道有RxJava这玩意，知道这玩意很屌，不过也就止于看看标题，看几段介绍的程度（懒癌害人不浅）。<br>这周心血来潮，抽空把之前收藏的 <a href="https://github.com/rengwuxian">扔物线</a>大神写的RxJava入门文章看了。</p>
+    <![CDATA[<p>之前就知道有RxJava这玩意，知道这玩意很屌，不过也就止于看看标题，看几段介绍的程度（懒癌害人不浅）。<br>这周心血来潮，抽空把之前收藏的 <a href="https://github.com/rengwuxian">扔物线</a> 大神写的RxJava入门文章看了。</p>
 <blockquote>
 <p><a href="http://gank.io/post/560e15be2dca930e00da1083">http://gank.io/post/560e15be2dca930e00da1083</a></p>
 </blockquote>
