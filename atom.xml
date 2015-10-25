@@ -5,7 +5,7 @@
   <subtitle><![CDATA[写博客的时候，我会假装四处看风景]]></subtitle>
   <link href="/atom.xml" rel="self"/>
   <link href="http://licheedev.com//"/>
-  <updated>2015-09-20T04:08:17.157Z</updated>
+  <updated>2015-10-25T16:41:35.771Z</updated>
   <id>http://licheedev.com//</id>
   
   <author>
@@ -14,6 +14,76 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title><![CDATA[周末终于去学了下RxJava，感觉屌爆了，相见恨晚啊]]></title>
+    <link href="http://licheedev.com/2015/10/26/rxjava-diao-bao-le/"/>
+    <id>http://licheedev.com/2015/10/26/rxjava-diao-bao-le/</id>
+    <published>2015-10-25T16:07:06.000Z</published>
+    <updated>2015-10-25T16:41:35.771Z</updated>
+    <content type="html"><![CDATA[<p>之前就知道有RxJava这玩意，知道这玩意很屌，不过也就止于看看标题，看几段介绍的程度（懒癌害人不浅）。<br>这周心血来潮，抽空把之前收藏的 <a href="https://github.com/rengwuxian" target="_blank" rel="external">扔物线</a>大神写的RxJava入门文章看了。</p>
+<blockquote>
+<p><a href="http://gank.io/post/560e15be2dca930e00da1083" target="_blank" rel="external">http://gank.io/post/560e15be2dca930e00da1083</a></p>
+</blockquote>
+<p>花了一晚上看完，顺便做做笔记，然后试着把上传和压缩图片的逻辑改用RxJava实现。<br>发现真的用得很爽。屌爆了。整个流程一口气写完，不需要在Handler中跳来跳去，还自带线程调度，真棒。</p>
+<p><img src="http://i11.tietuku.com/f22c9a6db3a672de.png" alt="截图"></p>
+<a id="more"></a>
+<p>下面是乱写的笔记，有些是直接Ctrl+C，Ctrl+V的，记得乱七八糟，估计也就我自己清楚这笔记写的是什么鬼了（其实就是就为了水篇博客而已，手动滑稽）。</p>
+<h1 id="下载">下载</h1><blockquote>
+<p><a href="https://github.com/ReactiveX/RxJava" target="_blank" rel="external">https://github.com/ReactiveX/RxJava</a><br><a href="https://github.com/ReactiveX/RxAndroid" target="_blank" rel="external">https://github.com/ReactiveX/RxAndroid</a></p>
+</blockquote>
+<p>写笔记时的最新版:<br><code>compile &#39;io.reactivex:rxjava:1.0.14&#39;</code><br><code>compile &#39;io.reactivex:rxandroid:1.0.1&#39;</code></p>
+<h1 id="理解">理解</h1><p>RxJava主要用到观察者模式，<code>观察者</code>和<code>被观察者</code>通过<code>订阅</code>完成绑定。<br>在程序中，<code>观察者</code>无法或者不好去主动（即定时查询，这样比较浪费性能，而且不及时）去获取<code>被观察者</code>的状态。<br>一般是在<code>被观察者</code>发生事件时，再去<strong>通知</strong><code>观察者</code>。虽然这和现实的情况有点区别。</p>
+<h1 id="用法">用法</h1><h2 id="流程">流程</h2><p>-&gt;实现<code>被观察者</code>，绑定<code>事件</code><br>—&gt;实现<code>观察者</code>，定义事件的响应<br>—-&gt;观察者<code>订阅</code>事件（<code>被观察者</code>.subscribe(<code>观察者</code>)）<br>——&gt;被订阅者开始发送事件</p>
+<h2 id="API">API</h2><h3 id="Observable：被观察者"><code>Observable</code>：被观察者</h3><p>通过<code>create()</code>、<code>just()</code>、<code>from()</code>来绑定（输入）事件来构造<code>被观察者</code>对象<br>通过<code>subscribe()</code>跟<code>观察者</code>并联，并开始向<code>观察者</code>发送事件</p>
+<p>通过<code>map()</code>，将输入的事件进行转换（加工）成另一个事件，返回结果给观察者响应</p>
+<p><code>flatMap()</code>,<code>可以</code>将输入的事件进行转换（加工）成其他事件（<code>1转1</code>，或者<code>1转多</code>），将新事件绑定到新的<code>被观察者</code>，构成新的<code>被观察者</code>对象，返回此新<code>被观察者</code>对象<br>(之后会由<code>新被观察者</code>发事件给<code>观察者</code>，所以<code>subscribe()</code>的时候，需要注意<code>观察者</code>响应的是事件类型，要跟<code>新观察者</code>一致）</p>
+<p><code>lift()</code>对<code>目标订阅者</code>进行层层包装，通过<code>Observable.Operator</code>，让包装后的<code>订阅者</code>可以直接处理<code>事件</code>。<br><code>compose()</code>是对多个<code>lift()</code>的封装</p>
+<p><code>throttleFirst()</code> 在每次事件触发后的一定时间间隔内丢弃新的事件，用作防抖什么的，按一次后，多少时间内再按了也没用</p>
+<h3 id="Observer：观察者"><code>Observer</code>：观察者</h3><p>主要响应事件<br><code>onNext()</code>、<code>onCompleted()</code>和<code>onError()</code><br><code>onCompleted()</code>和<code>onError()</code>互斥</p>
+<h4 id="Subscriber：实现了Observer的抽象类"><code>Subscriber</code>：实现了<code>Observer</code>的抽象类</h4><blockquote>
+<ul>
+<li><code>onStart()</code>: 这是 Subscriber 增加的方法。它会在 subscribe 刚开始，而事件还未发送之前被调用，可以用于做一些准备工作，例如数据的清零或重置。这是一个可选方法，默认情况下它的实现为空。需要注意的是，如果对准备工作的线程有要求（例如弹出一个显示进度的对话框，这必须在主线程执行）， onStart() 就不适用了，因为它总是在 subscribe 所发生的线程被调用，而不能指定线程。要在指定的线程来做准备工作，可以使用 doOnSubscribe() 方法，具体可以在后面的文中看到。</li>
+<li><code>unsubscribe()</code>: 这是 Subscriber 所实现的另一个接口 Subscription 的方法，用于取消订阅。在这个方法被调用后，Subscriber 将不再接收事件。一般在这个方法调用前，可以使用 isUnsubscribed() 先判断一下状态。 unsubscribe() 这个方法很重要，因为在 subscribe() 之后， Observable 会持有 Subscriber 的引用，这个引用如果不能及时被释放，将有内存泄露的风险。所以最好保持一个原则：要在不再使用的时候尽快在合适的地方（例如 onPause() onStop() 等方法中）调用 unsubscribe() 来解除引用关系，以避免内存泄露的发生。</li>
+</ul>
+</blockquote>
+<h4 id="Action0、Action1和ActionX：Observer的不完整版"><code>Action0</code>、<code>Action1</code>和<code>ActionX</code>：<code>Observer</code>的不完整版</h4><p><code>Action0</code>只响应一个事件，对应<code>onCompleted()</code><br><code>Action1</code>只响应一个事件，对应<code>onNext()</code>和<code>onCompleted()</code>,还有其他<code>Action2</code>、<code>Action3</code>等</p>
+<h3 id="Observable-OnSubscribe：订阅"><code>Observable.OnSubscribe</code>：订阅</h3><p>其实就是<code>事件</code>的抽象，<code>事件</code>会激发<code>观察者</code>,即调用<code>观察者</code>的响应回调</p>
+<h3 id="Scheduler：线程控制">Scheduler：线程控制</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Observable.just(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>) <span class="comment">// IO 线程，由 subscribeOn() 指定</span></span><br><span class="line">    .subscribeOn(Schedulers.io())</span><br><span class="line">    .observeOn(Schedulers.newThread())</span><br><span class="line">    .map(mapOperator) <span class="comment">// 新线程，由 observeOn() 指定</span></span><br><span class="line">    .observeOn(Schedulers.io())</span><br><span class="line">    .map(mapOperator2) <span class="comment">// IO 线程，由 observeOn() 指定</span></span><br><span class="line">    .observeOn(AndroidSchedulers.mainThread) </span><br><span class="line">    .subscribe(subscriber);  <span class="comment">// Android 主线程，由 observeOn() 指定</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<ul>
+<li><code>Schedulers.immediate()</code>: 直接在当前线程运行，相当于不指定线程。这是默认的 Scheduler。</li>
+<li><code>Schedulers.newThread()</code>: 总是启用新线程，并在新线程执行操作。</li>
+<li><code>Schedulers.io()</code>: I/O 操作（读写文件、读写数据库、网络信息交互等）所使用的 Scheduler。行为模式和 newThread() 差不多，区别在于 io() 的内部实现是是用一个无数量上限的线程池，可以重用空闲的线程，因此多数情况下 io() 比 newThread() 更有效率。不要把计算工作放在 io() 中，可以避免创建不必要的线程。</li>
+<li><code>Schedulers.computation()</code>: 计算所使用的 Scheduler。这个计算指的是 CPU 密集型计算，即不会被 I/O 等操作限制性能的操作，例如图形的计算。这个 Scheduler 使用的固定的线程池，大小为 CPU 核数。不要把 I/O 操作放在 computation() 中，否则 I/O 操作的等待时间会浪费 CPU。</li>
+<li><code>AndroidSchedulers.mainThread()</code>，它指定的操作将在 Android 主线程运行。</li>
+</ul>
+</blockquote>
+<ul>
+<li><code>subscribeOn()</code>指定订阅事件发生的线程（只生效一次，最先调用那次）</li>
+<li><code>observeOn()</code>指定观察者响应的线程，可调用（生效）多次</li>
+<li><code>doOnSubscribe()</code>  doOnSubscribe()的后面跟一个 subscribeOn() ，就能指定准备工作的线程了。</li>
+</ul>
+<blockquote>
+<p><code>doOnSubscribe()</code>和<code>Subscriber.onStart()</code>同样是在 subscribe() 调用后而且在事件发送前执行，但区别在于它可以指定线程。<br>默认情况下， doOnSubscribe() 执行在 subscribe() 发生的线程；而如果在 doOnSubscribe() 之后有 subscribeOn() 的话，它将执行在离它最近的 subscribeOn() 所指定的线程。</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Observable.create(onSubscribe)</span><br><span class="line">    .subscribeOn(Schedulers.io())</span><br><span class="line">    .doOnSubscribe(<span class="keyword">new</span> Action0() &#123;</span><br><span class="line">        <span class="annotation">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">call</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            progressBar.setVisibility(View.VISIBLE); <span class="comment">// 需要在主线程执行</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">    .subscribeOn(AndroidSchedulers.mainThread()) <span class="comment">// 指定主线程</span></span><br><span class="line">    .observeOn(AndroidSchedulers.mainThread())</span><br><span class="line">    .subscribe(subscriber);</span><br></pre></td></tr></table></figure>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>之前就知道有RxJava这玩意，知道这玩意很屌，不过也就止于看看标题，看几段介绍的程度（懒癌害人不浅）。<br>这周心血来潮，抽空把之前收藏的 <a href="https://github.com/rengwuxian">扔物线</a>大神写的RxJava入门文章看了。</p>
+<blockquote>
+<p><a href="http://gank.io/post/560e15be2dca930e00da1083">http://gank.io/post/560e15be2dca930e00da1083</a></p>
+</blockquote>
+<p>花了一晚上看完，顺便做做笔记，然后试着把上传和压缩图片的逻辑改用RxJava实现。<br>发现真的用得很爽。屌爆了。整个流程一口气写完，不需要在Handler中跳来跳去，还自带线程调度，真棒。</p>
+<p><img src="http://i11.tietuku.com/f22c9a6db3a672de.png" alt="截图"></p>]]>
+    
+    </summary>
+    
+      <category term="RxJava" scheme="http://licheedev.com/tags/RxJava/"/>
+    
+      <category term="Android" scheme="http://licheedev.com/categories/Android/"/>
+    
+  </entry>
   
   <entry>
     <title><![CDATA[加载网络图片但没URL？不要紧，通过ModelLoader，让Glide直接加载任何奇葩数据源]]></title>
