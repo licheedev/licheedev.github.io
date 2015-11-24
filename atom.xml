@@ -5,7 +5,7 @@
   <subtitle><![CDATA[写博客的时候，我会假装四处看风景]]></subtitle>
   <link href="/atom.xml" rel="self"/>
   <link href="http://licheedev.com//"/>
-  <updated>2015-10-25T16:45:55.372Z</updated>
+  <updated>2015-11-24T15:38:25.612Z</updated>
   <id>http://licheedev.com//</id>
   
   <author>
@@ -14,6 +14,41 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title><![CDATA[Android Studio 2.0 的即时运行（Instant Run）太赞了]]></title>
+    <link href="http://licheedev.com/2015/11/24/android-studio-2-0-instant-run/"/>
+    <id>http://licheedev.com/2015/11/24/android-studio-2-0-instant-run/</id>
+    <published>2015-11-24T15:14:12.000Z</published>
+    <updated>2015-11-24T15:38:25.612Z</updated>
+    <content type="html"><![CDATA[<p>就不久前，Android Studio才出了1.5正式版，我还没用上AS1.5，昨天又看到说出了AS 2.0预览版了。</p>
+<blockquote>
+<p><a href="http://www.jianshu.com/p/eb860d8709b5" target="_blank" rel="external">http://www.jianshu.com/p/eb860d8709b5</a></p>
+</blockquote>
+<p>据说性能有很大提升，有新的模拟器，还有屌炸天的<code>即时运行（Instant Run）</code>。</p>
+<p>于是晚上就把AS给升级了，简单的耍了下。</p>
+<p>不过暂时没看到所谓的新模拟器，可能是还没上线，过几天再看。</p>
+<p>而性能方面，说实话，首次编译的时候还是那么卡（Windows平台），卡到鼠标指针偶尔还是会停顿几下。挣方面没怎么觉得有啥大变化。</p>
+<p>不过下面这个 <a href="https://sites.google.com/a/android.com/tools/tech-docs/instant-run" target="_blank" rel="external">Instant Run</a> 真心逆天了，上图：</p>
+<p><img src="http://i5.tietuku.com/5e77264ca1331926.gif" alt="Instant Run"></p>
+<p>就是这么爽，再也不用改一点点代码，就又得等几分钟才能编译好了。</p>
+<p>顺便期待一下那个<code>新模拟器</code>，毕竟Genymotion免费版的功能有点弱，原官方的模拟器又太卡。</p>
+<p>最后上个下载地址，新版本都在这里</p>
+<blockquote>
+<p><a href="https://sites.google.com/a/android.com/tools/download/studio/canary" target="_blank" rel="external">https://sites.google.com/a/android.com/tools/download/studio/canary</a></p>
+</blockquote>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>就不久前，Android Studio才出了1.5正式版，我还没用上AS1.5，昨天又看到说出了AS 2.0预览版了。</p>
+<blockquote>
+<p><a href="http://www.jianshu.com/p/eb860d8709b5" target="_]]>
+    </summary>
+    
+      <category term="Android" scheme="http://licheedev.com/tags/Android/"/>
+    
+      <category term="Android" scheme="http://licheedev.com/categories/Android/"/>
+    
+  </entry>
   
   <entry>
     <title><![CDATA[周末终于去学了下RxJava，感觉屌爆了，相见恨晚啊]]></title>
