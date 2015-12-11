@@ -5,7 +5,7 @@
   <subtitle><![CDATA[写博客的时候，我会假装四处看风景]]></subtitle>
   <link href="/atom.xml" rel="self"/>
   <link href="http://licheedev.com//"/>
-  <updated>2015-12-11T13:00:46.804Z</updated>
+  <updated>2015-12-11T13:03:22.034Z</updated>
   <id>http://licheedev.com//</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://licheedev.com/2015/12/11/change-apk-package/"/>
     <id>http://licheedev.com/2015/12/11/change-apk-package/</id>
     <published>2015-12-11T12:02:58.000Z</published>
-    <updated>2015-12-11T13:00:46.804Z</updated>
+    <updated>2015-12-11T13:03:22.034Z</updated>
     <content type="html"><![CDATA[<p>今天有个朋友问我，怎么用Android Studio改应用的包名。<br>他的情况是，项目是从eclipse那里导入到AS上面的，不知道为毛，原包名是com.xxx.yyy.activity，想改成com.aaa.bbb。<br>好吧，其实我也没在AS上改过包名，于是试着自己玩了下，过程有点坑，于是写篇博客总结一下。</p>
 <h1 id="用Android_Studio自带的Refactor-Rename(重构-重命名)更改包名">用Android Studio自带的<code>Refactor-Rename(重构-重命名)</code>更改包名</h1><p>当然，一开始想到的就是AS的重命名功能（快捷键<code>shift+f6</code>）,<br>恩，挺好用，但是发现一次只能包路径的单一层次？嗯，什么鬼？</p>
 <p><img src="http://i5.tietuku.com/c0e1d8b8beca2e80.gif" alt="Refactor-Rename"></p>
@@ -36,7 +36,7 @@
 <ol>
 <li><p>修改目标module<code>AndroidManifest.xml</code>中的<code>package</code>，还有<code>build.gradle</code>中的<code>applicationId</code>；</p>
 </li>
-<li><p>定位R文件，在R文件所在的<code>那些个目录</code>（这个不知道怎么用文字描述，等下看图吧）中建立新包;</p>
+<li><p>定位R文件(这里用快捷键<code>ctrl+n</code>)，在R文件所在的<code>那些个目录</code>（这个不知道怎么用文字描述，等下看图吧）中建立新包;</p>
 </li>
 <li><p>移动R文件到新包中，根据提示选择重构相关文件。</p>
 </li>
