@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   
-  <title>ListView | LicheeDev-某黎的博客</title>
+  <title>使用Android Studio灵活地更改应用包名 | LicheeDev-某黎的博客</title>
   <meta name="author" content="John Lee">
   
   <meta name="description" content="黎某人的博客。乱七八糟都记点。">
@@ -11,7 +11,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  
+  <meta property="og:title" content="使用Android Studio灵活地更改应用包名"/>
   <meta property="og:site_name" content="LicheeDev-某黎的博客"/>
 
   
@@ -60,43 +60,106 @@
 </nav>
 <div class="clearfix"></div></header>
   <div id="content" class="inner">
-    <div id="main-col" class="alignleft"><div id="wrapper">
-<h2 class="archive-title tag">ListView</h2>
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2015-12-11T12:02:58.000Z"><a href="/2015/12/11/change-apk-package/">2015-12-11</a></time>
+      
+      
+  
+    <h1 class="title">使用Android Studio灵活地更改应用包名</h1>
+  
 
+    </header>
+    <div class="entry">
+      
+        <p>今天有个朋友问我，怎么用Android Studio改应用的包名。<br>他的情况是，项目是从eclipse那里导入到AS上面的，不知道为毛，原包名是com.xxx.yyy.activity，想改成com.aaa.bbb。<br>好吧，其实我也没在AS上改过包名，于是试着自己玩了下，过程有点坑，于是写篇博客总结一下。</p>
+<h1 id="用Android_Studio自带的Refactor-Rename(重构-重命名)更改包名">用Android Studio自带的<code>Refactor-Rename(重构-重命名)</code>更改包名</h1><p>当然，一开始想到的就是AS的重命名功能（快捷键<code>shift+f6</code>）,<br>恩，挺好用，但是发现一次只能包路径的单一层次？嗯，什么鬼？</p>
+<p><img src="http://i5.tietuku.com/c0e1d8b8beca2e80.gif" alt="Refactor-Rename"></p>
+<p>就是上图那样，每次只能改一层，也只能<code>重命名</code>一层。<br>而且最重要的是，无法更改层次结构，就是说原来包名是com.xxx.yyy，没法改成 com.xxx 或者 com.xxx.yyy.zzz。<br>如果目标包名跟原包名层次结构一样，那么可以无视下文了。AS的这个重命名功能就十分好使。该完后顺便把gradle的<code>applicationId</code>改了就OK了。</p>
+<a id="more"></a>
+<h1 id="自己动手改">自己动手改</h1><p>如果只用AS的重命名功能，估计没法完成我朋友的需求了，毕竟要改层次。<br>看来只能手动改完清单文件的包名后，再一个个去改代码中R文件的包名。<br>感觉要疯，毕竟代码中，引用R文件的频率略高，一个一个改工作量太大。</p>
+<p>想起试过在AS里面移动过xxx.java，然后所有引用xxx类的文件也会更改相应导入包的路径。<br>于是就想着是不是可以从R文件入手，把R文件移动到新包上，利用AS强大的重构功能去自动更改其他文件引用R文件的路径。<br>发现的确可行。</p>
+<p>下面简单归纳一下步骤：</p>
+<ol>
+<li>更改AS项目结构的显示方式,如下图；</li>
+</ol>
+<p><img src="http://i5.tietuku.com/0a3d89aa68ca5414.gif" alt="更改AS项目结构的显示方式"></p>
+<ol>
+<li><p>修改目标module<code>AndroidManifest.xml</code>中的<code>package</code>，还有<code>build.gradle</code>中的<code>applicationId</code>；</p>
+</li>
+<li><p>定位R文件，在R文件所在的<code>那些个目录</code>（这个不知道怎么用文字描述，等下看图吧）中建立新包;</p>
+</li>
+<li><p>移动R文件到新包中，根据提示选择重构相关文件。</p>
+</li>
+<li><p><code>AndroidManifest.xml</code>中某些四大组件的<code>name</code>属性可能用了相对路径，这时会提示出错，重新改一下路径即可，最好改成绝对路径。</p>
+</li>
+</ol>
+<p><img src="http://i5.tietuku.com/54eaba34f9086559.png" alt="四大组件的name属性"></p>
+<p>上面是没啥营养的文字说明，具体操作还是看动图吧，注意移动R文件并<code>Refactor</code>其他文件的时候，AS会卡一阵，其实后面还有内容的。</p>
+<p><img src="http://i5.tietuku.com/eae255445737dbb2.gif" alt="具体操作"></p>
+<p>就是这样，其实挺简单的。</p>
 
-  <div class="archive">
-    
-      <article class="post">
-        <div class="post-content">
-          <header>
-            <div class="icon"></div>
-            <time datetime="2015-03-23T13:49:39.000Z"><a href="/2015/03/23/no-viewholder-listview-performance/">2015-03-23</a></time>
-            
-              <h1 class="title"><a href="/2015/03/23/no-viewholder-listview-performance/">ViewHolder模式&amp;无ViewHolder模式ListView性能对比</a></h1>
-            
-          </header>
-        </div>
-      </article>
-    
-      <article class="post">
-        <div class="post-content">
-          <header>
-            <div class="icon"></div>
-            <time datetime="2015-03-21T14:17:14.000Z"><a href="/2015/03/21/no-viewholder-listview/">2015-03-21</a></time>
-            
-              <h1 class="title"><a href="/2015/03/21/no-viewholder-listview/">摆脱ViewHolder，一种无需ViewHolder的高效ListView写法</a></h1>
-            
-          </header>
-        </div>
-      </article>
-    
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/Android/">Android</a>
   </div>
 
-<nav id="pagination">
+        
+  
+  <div class="tags">
+    <a href="/tags/Android/">Android</a>
+  </div>
+
+        
+        <nav id="pagination">
+
+
+      
+
+      
+        <a href="/2015/11/24/android-studio-2-0-instant-run/" class="alignright next">后一篇</a>
+      
+
+</nav>
+      
+      <div class="clearfix"></div>
+    </footer>
+
+  </div>
+</article>
+
+
+<section id="comment">
+  <h1 class="title">评论</h1>
+
+    <div class="ds-thread" data-thread-key="2015/12/11/change-apk-package/" data-title="使用Android Studio灵活地更改应用包名" data-url="http://licheedev.com/2015/12/11/change-apk-package/"></div>
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"licheedev"};
+    (function() {
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.unstable.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0] 
+         || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+    </script>
+  </section>
   
   
-  <div class="clearfix"></div>
-</nav></div></div>
+
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"1","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"16"},"slide":{"type":"slide","bdImg":"3","bdPos":"right","bdTop":"100"}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+
+</div></div>
     <aside id="sidebar" class="alignright">
   
 

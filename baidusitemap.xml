@@ -3,8 +3,28 @@
 
     
   <url>
+    <loc>http://licheedev.com/2015/12/11/change-apk-package/</loc>
+    <lastmod>2015-12-11T13:00:46.804Z</lastmod>
+    <data>
+        <display>
+        <title><![CDATA[使用Android Studio灵活地更改应用包名]]></title>
+        <pubTime>2015-12-11T12:02:58.000Z</pubTime>
+        
+        <tag>Android </tag>
+         
+         
+           
+             
+              <breadCrumb title="Android" url="http://licheedev.com/categories/Android/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>http://licheedev.com/2015/11/24/android-studio-2-0-instant-run/</loc>
-    <lastmod>2015-11-24T15:38:25.612Z</lastmod>
+    <lastmod>2015-12-11T13:00:19.418Z</lastmod>
     <data>
         <display>
         <title><![CDATA[Android Studio 2.0 的即时运行（Instant Run）太赞了]]></title>
