@@ -79,7 +79,7 @@
         <p>今天有个朋友问我，怎么用Android Studio改应用的包名。<br>他的情况是，项目是从eclipse那里导入到AS上面的，不知道为毛，原包名是com.xxx.yyy.activity，想改成com.aaa.bbb。<br>好吧，其实我也没在AS上改过包名，于是试着自己玩了下，过程有点坑，于是写篇博客总结一下。</p>
 <h1 id="用Android_Studio自带的Refactor-Rename(重构-重命名)更改包名">用Android Studio自带的<code>Refactor-Rename(重构-重命名)</code>更改包名</h1><p>当然，一开始想到的就是AS的重命名功能（快捷键<code>shift+f6</code>）,<br>恩，挺好用，但是发现一次只能包路径的单一层次？嗯，什么鬼？</p>
 <p><img src="http://i5.tietuku.com/c0e1d8b8beca2e80.gif" alt="Refactor-Rename"></p>
-<p>就是上图那样，每次只能改一层，也只能<code>重命名</code>一层。<br>而且最重要的是，无法更改层次结构，就是说原来包名是com.xxx.yyy，没法改成 com.xxx 或者 com.xxx.yyy.zzz。<br>如果目标包名跟原包名层次结构一样，那么可以无视下文了。AS的这个重命名功能就十分好使。该完后顺便把gradle的<code>applicationId</code>改了就OK了。</p>
+<p>就是上图那样，每次只能改一层，也只能<code>重命名</code>一层。<br>而且最重要的是，无法更改层次结构，就是说原来包名是com.xxx.yyy，没法改成 com.xxx 或者 com.xxx.yyy.zzz。<br>如果目标包名跟原包名层次结构一样，那么可以无视下文了。AS的这个重命名功能就十分好使。<br>改完后顺便把gradle的<code>applicationId</code>改了就OK了。</p>
 <a id="more"></a>
 <h1 id="自己动手改">自己动手改</h1><p>如果只用AS的重命名功能，估计没法完成我朋友的需求了，毕竟要改层次。<br>看来只能手动改完清单文件的包名后，再一个个去改代码中R文件的包名。<br>感觉要疯，毕竟代码中，引用R文件的频率略高，一个一个改工作量太大。</p>
 <p>想起试过在AS里面移动过xxx.java，然后所有引用xxx类的文件也会更改相应导入包的路径。<br>于是就想着是不是可以从R文件入手，把R文件移动到新包上，利用AS强大的重构功能去自动更改其他文件引用R文件的路径。<br>发现的确可行。</p>
