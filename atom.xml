@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
   
-  <title><![CDATA[LicheeDev-某黎的博客]]></title>
-  <subtitle><![CDATA[写博客的时候，我会假装四处看风景]]></subtitle>
+  <title><![CDATA[doge的博客]]></title>
+  <subtitle><![CDATA[好想养一只doge当表情包]]></subtitle>
   <link href="/atom.xml" rel="self"/>
   <link href="http://licheedev.com//"/>
   <updated>2015-12-11T13:45:40.599Z</updated>
